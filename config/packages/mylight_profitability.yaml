@@ -158,3 +158,13 @@ template:
           {% else %}
             {{ (now() + timedelta(days=remaining / (states('sensor.gain_mylight_annuel_attendu') | float) * 365.25)).date() }}
           {% endif %}
+      - name: État de charge batterie virtuelle
+        unique_id: mylight_virtual_battery_soc
+        unit_of_measurement: "%"
+        device_class: battery
+        state_class: measurement
+        availability: "{{ states('sensor.mylight_systems_energie_stockee_en_batterie') | is_number }}"
+        state: >
+          {% from 'mylight.jinja' import msb_forfaits %}
+          {% set forfait = msb_forfaits() | from_json | selectattr('from', '<=', now().date() | string) | list | last %}
+          {{ ([states('sensor.mylight_systems_energie_stockee_en_batterie') | float / forfait.kwh * 100, 100] | min) | round(1) }}

@@ -7,7 +7,7 @@ Configuration versionnée d'un Home Assistant domestique (Raspberry Pi 4, Home A
 | Fichier | Rôle |
 |---|---|
 | `config/packages/energy_tariff.yaml` | Plages d'heures creuses et prix du kWh en vigueur |
-| `config/packages/mylight_profitability.yaml` | Gain de la batterie virtuelle face à EDF Tarif Bleu, économie de l'installation et dates de retour sur investissement |
+| `config/packages/mylight_profitability.yaml` | Gain de la batterie virtuelle face à EDF Tarif Bleu, économie de l'installation, dates de retour sur investissement et état de charge de la batterie virtuelle (affiché dans l'onglet Énergie) |
 | `config/packages/notifications.yaml` | Alertes push : sources de données muettes, sauvegarde manquante, redémarrage, sonnette, fenêtre de passage en MSB 100 |
 | `config/dashboards/rentabilite.yaml` | Page Rentabilité |
 | `config/custom_templates/mylight.example.jinja` | Catalogue daté des tarifs, forfaits, volumes de référence et investissements, avec des valeurs fictives |
@@ -34,5 +34,5 @@ Les intégrations (Enphase, MyLight, Ring, Google Drive, Tailscale), le tableau 
 ## Règles
 
 - **MyLight** : ne jamais activer le niveau de log `debug` pour cette intégration, il écrit le mot de passe MyLight dans `home-assistant.log` ; ne pas utiliser son service d'export CSV, il dépose le fichier dans `/config/www/`, servi sans authentification. Mises à jour à suivre à la main sur les tags du dépôt amont.
-- **Page Rentabilité** : à chaque changement de forfait MySmartBattery ou de prix, ajouter une ligne datée dans `mylight.jinja` (`ml_tariffs` ou `msb_forfaits`), sans toucher aux lignes passées, puis recharger les templates personnalisés. Mettre à jour `reference_year` chaque automne avec les volumes des 12 derniers mois.
+- **Page Rentabilité** : à chaque changement de forfait MySmartBattery ou de prix, ajouter une ligne datée dans `mylight.jinja` (`ml_tariffs`, ou `msb_forfaits` avec la capacité du palier en `kwh`), sans toucher aux lignes passées, puis recharger les templates personnalisés. Mettre à jour `reference_year` chaque automne avec les volumes des 12 derniers mois.
 - **Tableau Énergie** : achats et réinjection viennent de MyLight, la batterie virtuelle aussi (charge et décharge), le solaire de l'Envoy. L'historique antérieur à la mise en service a été importé depuis l'API MyLight au pas journalier.
