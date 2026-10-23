@@ -1,0 +1,24 @@
+template:
+  - binary_sensor:
+      - name: Heures creuses
+        unique_id: electricity_off_peak
+        icon: mdi:clock-time-two-outline
+        state: >
+          {% set ranges = [('02:00', '07:00'), ('12:30', '15:30')] %}
+          {% set t = now().strftime('%H:%M') %}
+          {% set ns = namespace(on=false) %}
+          {% for start, end in ranges %}
+            {% set inside = (start <= t < end) if start < end else (t >= start or t < end) %}
+            {% if inside %}{% set ns.on = true %}{% endif %}
+          {% endfor %}
+          {{ ns.on }}
+
+  - sensor:
+      - name: Prix électricité
+        unique_id: electricity_price
+        icon: mdi:currency-eur
+        unit_of_measurement: EUR/kWh
+        state: >
+          {% from 'mylight.jinja' import ml_tariffs %}
+          {% set current = ml_tariffs() | from_json | selectattr('from', '<=', now().date() | string) | list | last %}
+          {{ current.off_peak if is_state('binary_sensor.heures_creuses', 'on') else current.peak }}

@@ -1,0 +1,121 @@
+automation:
+  - id: alert_data_source_offline
+    alias: Alerter si l'Envoy ou MyLight ne répond plus
+    mode: queued
+    triggers:
+      - trigger: state
+        entity_id: sensor.envoy_122333060519_production_d_electricite_actuelle
+        to: unavailable
+        for: "00:30:00"
+        id: envoy_down
+      - trigger: state
+        entity_id: sensor.envoy_122333060519_production_d_electricite_actuelle
+        from: unavailable
+        id: envoy_up
+      - trigger: state
+        entity_id: sensor.mylight_systems_decharge_batterie
+        to: unavailable
+        for: "01:00:00"
+        id: mylight_down
+      - trigger: state
+        entity_id: sensor.mylight_systems_decharge_batterie
+        from: unavailable
+        id: mylight_up
+    conditions:
+      - condition: template
+        value_template: >
+          {{ trigger.id.endswith('_down')
+             or (trigger.to_state.state not in ['unavailable', 'unknown']
+                 and now() - trigger.from_state.last_changed > timedelta(minutes=30)) }}
+    actions:
+      - variables:
+          source: "{{ 'Envoy' if trigger.id.startswith('envoy') else 'MyLight' }}"
+      - action: notify.mobile_app_pixel_6
+        data:
+          title: "{{ source }} {{ 'ne répond plus' if trigger.id.endswith('_down') else 'répond de nouveau' }}"
+          message: >
+            {% if trigger.id.endswith('_down') %}
+              Aucune donnée depuis {{ '30 minutes' if source == 'Envoy' else '1 heure' }}.
+            {% else %}
+              Coupure de {{ ((now() - trigger.from_state.last_changed).total_seconds() / 60) | round(0) | int }} minutes.
+            {% endif %}
+
+  - id: alert_backup_failed
+    alias: Alerter si une sauvegarde échoue ou manque
+    mode: single
+    triggers:
+      - trigger: state
+        entity_id: event.backup_automatic_backup
+        id: event
+      - trigger: time
+        at: "09:00:00"
+        id: daily_check
+    conditions:
+      - condition: template
+        value_template: >
+          {% if trigger.id == 'event' %}
+            {{ trigger.to_state.attributes.event_type == 'failed' }}
+          {% else %}
+            {% set last = states('sensor.backup_last_successful_automatic_backup') | as_datetime %}
+            {{ last is none or now() - last > timedelta(hours=26) }}
+          {% endif %}
+    actions:
+      - action: notify.mobile_app_pixel_6
+        data:
+          title: Sauvegarde Home Assistant
+          message: >
+            {% if trigger.id == 'event' %}
+              La sauvegarde automatique a échoué.
+            {% else %}
+              Aucune sauvegarde réussie depuis plus de 26 heures.
+            {% endif %}
+
+  - id: notify_msb_100_switch
+    alias: Prévenir quand le stock virtuel permet de passer en MSB 100
+    mode: single
+    triggers:
+      - trigger: numeric_state
+        entity_id: sensor.mylight_systems_energie_stockee_en_batterie
+        below: 100
+    conditions:
+      - condition: template
+        value_template: "{{ trigger.from_state.state | is_number }}"
+    actions:
+      - action: notify.mobile_app_pixel_6
+        data:
+          title: Passer en MySmartBattery 100
+          message: >
+            Stock virtuel à {{ trigger.to_state.state | float | round(0) | int }} kWh :
+            le passage en MSB 100 ne fait plus perdre de stock. À demander à MyLight150.
+
+  - id: notify_home_assistant_started
+    alias: Prévenir quand Home Assistant redémarre
+    mode: single
+    triggers:
+      - trigger: homeassistant
+        event: start
+    actions:
+      - action: notify.mobile_app_pixel_6
+        data:
+          title: Home Assistant a redémarré
+          message: "Démarrage à {{ now().strftime('%H:%M') }}."
+
+  - id: doorbell_announce
+    alias: Prévenir le téléphone quand on sonne
+    mode: single
+    max_exceeded: silent
+    triggers:
+      - trigger: state
+        entity_id: event.porte_d_entree_sonnerie
+    conditions:
+      - condition: template
+        value_template: >
+          {{ trigger.to_state.attributes.event_type == 'ring'
+             and trigger.to_state.state | as_datetime is not none
+             and now() - (trigger.to_state.state | as_datetime) < timedelta(seconds=30) }}
+    actions:
+      - action: notify.mobile_app_pixel_6
+        data:
+          title: Sonnette
+          message: Quelqu'un sonne à la porte d'entrée.
+      - delay: "00:00:30"

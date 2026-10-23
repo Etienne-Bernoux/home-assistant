@@ -1,0 +1,24 @@
+{% macro ml_tariffs() -%}
+[
+  {"from": "2000-01-01", "peak": 0.2142, "off_peak": 0.1589},
+  {"from": "2026-11-01", "peak": 0.2540, "off_peak": 0.1900}
+]
+{%- endmacro %}
+
+{% macro msb_forfaits() -%}
+[
+  {"from": "2025-01-01", "monthly": 21.99}
+]
+{%- endmacro %}
+
+{% macro reference_year() -%}
+{"period": "2025-01 to 2025-12", "bought_kwh": 6000.0, "returned_kwh": 4000.0, "green_kwh": 4000.0, "reinjected_kwh": 200.0}
+{%- endmacro %}
+
+{% macro investments() -%}
+{"installation_total": 15000.00, "mylight_hardware": 3000.00}
+{%- endmacro %}
+
+{% macro baseline() -%}
+{"ml_energy_eur": 0, "edf_panels_eur": 0, "no_panels_eur": 0, "contribution_start": "2025-01-01"}
+{%- endmacro %}

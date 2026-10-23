@@ -1,0 +1,160 @@
+template:
+  - triggers:
+      - trigger: time_pattern
+        minutes: "/15"
+      - trigger: homeassistant
+        event: start
+      - trigger: event
+        event_type: event_template_reloaded
+    sensor:
+      - name: Rentabilité MyLight compteurs
+        unique_id: mylight_profitability_engine
+        icon: mdi:calculator
+        state: "{{ now().isoformat() }}"
+        attributes:
+          day: "{{ now().date() | string }}"
+          last_bought: "{{ states('sensor.mylight_systems_consommation_reseau_sans_batterie_virtuelle') | float(this.attributes.get('last_bought', 0) | float(0)) | round(3) }}"
+          last_returned: "{{ states('sensor.mylight_systems_decharge_batterie') | float(this.attributes.get('last_returned', 0) | float(0)) | round(3) }}"
+          last_green: "{{ states('sensor.mylight_systems_energie_verte_solaire_direct') | float(this.attributes.get('last_green', 0) | float(0)) | round(3) }}"
+          last_reinjected: "{{ states('sensor.mylight_systems_energie_reinjectee_au_reseau') | float(this.attributes.get('last_reinjected', 0) | float(0)) | round(3) }}"
+          ml_energy_eur: >
+            {% from 'mylight.jinja' import baseline %}
+            {% macro delta(entity, last) -%}
+              {%- set cur = states(entity) | float(none) -%}
+              {%- set last = last | float(0) -%}
+              {{- 0 if cur is none else (cur - last if cur >= last else cur) -}}
+            {%- endmacro %}
+            {% set same_day = this.attributes.get('day') == now().date() | string %}
+            {% set bought = delta('sensor.mylight_systems_consommation_reseau_sans_batterie_virtuelle', this.attributes.get('last_bought', 0) if same_day else 0) | float / 1000 %}
+            {% set reinjected = delta('sensor.mylight_systems_energie_reinjectee_au_reseau', this.attributes.get('last_reinjected', 0) if same_day else 0) | float / 1000 %}
+            {% set price = states('sensor.prix_electricite') | float(0.2142) %}
+            {{ (this.attributes.get('ml_energy_eur') | float((baseline() | from_json).ml_energy_eur) + bought * price - reinjected * 0.042) | round(4) }}
+          edf_panels_eur: >
+            {% from 'mylight.jinja' import baseline %}
+            {% macro delta(entity, last) -%}
+              {%- set cur = states(entity) | float(none) -%}
+              {%- set last = last | float(0) -%}
+              {{- 0 if cur is none else (cur - last if cur >= last else cur) -}}
+            {%- endmacro %}
+            {% set same_day = this.attributes.get('day') == now().date() | string %}
+            {% set bought = delta('sensor.mylight_systems_consommation_reseau_sans_batterie_virtuelle', this.attributes.get('last_bought', 0) if same_day else 0) | float / 1000 %}
+            {% set returned = delta('sensor.mylight_systems_decharge_batterie', this.attributes.get('last_returned', 0) if same_day else 0) | float / 1000 %}
+            {% set trv = 0.1589 if is_state('binary_sensor.heures_creuses', 'on') else 0.2142 %}
+            {{ (this.attributes.get('edf_panels_eur') | float((baseline() | from_json).edf_panels_eur) + (bought + returned) * trv) | round(4) }}
+          no_panels_eur: >
+            {% from 'mylight.jinja' import baseline %}
+            {% macro delta(entity, last) -%}
+              {%- set cur = states(entity) | float(none) -%}
+              {%- set last = last | float(0) -%}
+              {{- 0 if cur is none else (cur - last if cur >= last else cur) -}}
+            {%- endmacro %}
+            {% set same_day = this.attributes.get('day') == now().date() | string %}
+            {% set bought = delta('sensor.mylight_systems_consommation_reseau_sans_batterie_virtuelle', this.attributes.get('last_bought', 0) if same_day else 0) | float / 1000 %}
+            {% set returned = delta('sensor.mylight_systems_decharge_batterie', this.attributes.get('last_returned', 0) if same_day else 0) | float / 1000 %}
+            {% set green = delta('sensor.mylight_systems_energie_verte_solaire_direct', this.attributes.get('last_green', 0) if same_day else 0) | float / 1000 %}
+            {% set trv = 0.1589 if is_state('binary_sensor.heures_creuses', 'on') else 0.2142 %}
+            {{ (this.attributes.get('no_panels_eur') | float((baseline() | from_json).no_panels_eur) + (bought + returned + green) * trv) | round(4) }}
+          fixed_eur: >
+            {% from 'mylight.jinja' import msb_forfaits, baseline %}
+            {% set forfaits = msb_forfaits() | from_json %}
+            {% set ns = namespace(total=0) %}
+            {% for forfait in forfaits %}
+              {% set begin = as_datetime(forfait.from ~ 'T00:00:00').replace(tzinfo=now().tzinfo) %}
+              {% set end = as_datetime(forfaits[loop.index].from ~ 'T00:00:00').replace(tzinfo=now().tzinfo) if not loop.last else now() %}
+              {% set end = [end, now()] | min %}
+              {% if end > begin %}
+                {% set ns.total = ns.total + forfait.monthly * 12 / 365.25 * (end - begin).total_seconds() / 86400 %}
+              {% endif %}
+            {% endfor %}
+            {% set contribution_start = as_datetime((baseline() | from_json).contribution_start ~ 'T00:00:00').replace(tzinfo=now().tzinfo) %}
+            {% set contribution = 58 / 365.25 * (now() - contribution_start).total_seconds() / 86400 %}
+            {{ (ns.total + contribution) | round(4) }}
+
+  - sensor:
+      - name: Gain MyLight cumulé
+        unique_id: mylight_gain_total
+        icon: mdi:battery-heart-variant
+        unit_of_measurement: EUR
+        device_class: monetary
+        state_class: total
+        availability: "{% set e = 'sensor.rentabilite_mylight_compteurs' %}{{ state_attr(e, 'ml_energy_eur') is number and state_attr(e, 'edf_panels_eur') is number and state_attr(e, 'no_panels_eur') is number and state_attr(e, 'fixed_eur') is number }}"
+        state: >
+          {% set a = states.sensor.rentabilite_mylight_compteurs.attributes %}
+          {{ (a.edf_panels_eur | float - a.ml_energy_eur | float - a.fixed_eur | float) | round(2) }}
+      - name: Économie installation cumulée
+        unique_id: solar_savings_total
+        icon: mdi:solar-power-variant
+        unit_of_measurement: EUR
+        device_class: monetary
+        state_class: total
+        availability: "{% set e = 'sensor.rentabilite_mylight_compteurs' %}{{ state_attr(e, 'ml_energy_eur') is number and state_attr(e, 'edf_panels_eur') is number and state_attr(e, 'no_panels_eur') is number and state_attr(e, 'fixed_eur') is number }}"
+        state: >
+          {% set a = states.sensor.rentabilite_mylight_compteurs.attributes %}
+          {{ (a.no_panels_eur | float - a.ml_energy_eur | float - a.fixed_eur | float) | round(2) }}
+      - name: Amortissement installation
+        unique_id: solar_payback_progress
+        icon: mdi:progress-check
+        unit_of_measurement: "%"
+        state_class: measurement
+        availability: "{{ states('sensor.economie_installation_cumulee') | is_number }}"
+        state: >
+          {% from 'mylight.jinja' import investments %}
+          {{ (states('sensor.economie_installation_cumulee') | float / (investments() | from_json).installation_total * 100) | round(1) }}
+      - name: Économie annuelle attendue
+        unique_id: solar_savings_expected_yearly
+        icon: mdi:chart-line
+        unit_of_measurement: EUR
+        state: >
+          {% from 'mylight.jinja' import ml_tariffs, msb_forfaits, reference_year %}
+          {% set today = now().date() | string %}
+          {% set tariff = ml_tariffs() | from_json | selectattr('from', '<=', today) | list | last %}
+          {% set forfait = msb_forfaits() | from_json | selectattr('from', '<=', today) | list | last %}
+          {% set year = reference_year() | from_json %}
+          {% set ml_avg = 0.75 * tariff.peak + 0.25 * tariff.off_peak %}
+          {% set trv_avg = 0.75 * 0.2142 + 0.25 * 0.1589 %}
+          {{ ((year.green_kwh + year.bought_kwh + year.returned_kwh) * trv_avg - year.bought_kwh * ml_avg
+              - forfait.monthly * 12 - 58 + year.reinjected_kwh * 0.042) | round(0) }}
+      - name: Retour sur investissement estimé
+        unique_id: solar_payback_date
+        icon: mdi:calendar-check
+        device_class: date
+        availability: >
+          {{ states('sensor.economie_installation_cumulee') | is_number
+             and states('sensor.economie_annuelle_attendue') | float(0) > 0 }}
+        state: >
+          {% from 'mylight.jinja' import investments %}
+          {% set remaining = (investments() | from_json).installation_total - states('sensor.economie_installation_cumulee') | float %}
+          {% if remaining <= 0 %}
+            {{ now().date() }}
+          {% else %}
+            {{ (now() + timedelta(days=remaining / (states('sensor.economie_annuelle_attendue') | float) * 365.25)).date() }}
+          {% endif %}
+      - name: Gain MyLight annuel attendu
+        unique_id: mylight_gain_expected_yearly
+        icon: mdi:chart-line
+        unit_of_measurement: EUR
+        state: >
+          {% from 'mylight.jinja' import ml_tariffs, msb_forfaits, reference_year %}
+          {% set today = now().date() | string %}
+          {% set tariff = ml_tariffs() | from_json | selectattr('from', '<=', today) | list | last %}
+          {% set forfait = msb_forfaits() | from_json | selectattr('from', '<=', today) | list | last %}
+          {% set year = reference_year() | from_json %}
+          {% set ml_avg = 0.75 * tariff.peak + 0.25 * tariff.off_peak %}
+          {% set trv_avg = 0.75 * 0.2142 + 0.25 * 0.1589 %}
+          {{ ((year.bought_kwh + year.returned_kwh) * trv_avg - year.bought_kwh * ml_avg
+              - forfait.monthly * 12 - 58 + year.reinjected_kwh * 0.042) | round(0) }}
+      - name: Remboursement MyLight estimé
+        unique_id: mylight_payback_date
+        icon: mdi:calendar-check
+        device_class: date
+        availability: >
+          {{ states('sensor.gain_mylight_cumule') | is_number
+             and states('sensor.gain_mylight_annuel_attendu') | float(0) > 0 }}
+        state: >
+          {% from 'mylight.jinja' import investments %}
+          {% set remaining = (investments() | from_json).mylight_hardware - states('sensor.gain_mylight_cumule') | float %}
+          {% if remaining <= 0 %}
+            {{ now().date() }}
+          {% else %}
+            {{ (now() + timedelta(days=remaining / (states('sensor.gain_mylight_annuel_attendu') | float) * 365.25)).date() }}
+          {% endif %}

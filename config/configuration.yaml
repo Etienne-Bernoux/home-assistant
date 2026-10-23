@@ -1,0 +1,22 @@
+# Loads default set of integrations. Do not remove.
+default_config:
+
+homeassistant:
+  packages: !include_dir_named packages
+
+# Load frontend themes from the themes folder
+frontend:
+  themes: !include_dir_merge_named themes
+
+lovelace:
+  dashboards:
+    dashboard-rentabilite:
+      mode: yaml
+      title: Rentabilité
+      icon: mdi:cash-check
+      show_in_sidebar: true
+      filename: dashboards/rentabilite.yaml
+
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
