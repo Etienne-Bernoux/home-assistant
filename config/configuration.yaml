@@ -16,6 +16,12 @@ lovelace:
       icon: mdi:cash-check
       show_in_sidebar: true
       filename: dashboards/rentabilite.yaml
+    dashboard-maison:
+      mode: yaml
+      title: Maison
+      icon: mdi:floor-plan
+      show_in_sidebar: true
+      filename: dashboards/maison.yaml
 
 automation: !include automations.yaml
 script: !include scripts.yaml

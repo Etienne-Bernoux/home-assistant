@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="30 30 600 945">
+<polygon id="floor" points="165,45 558,45 558,658 610,658 610,960 90,960 90,678 42,678 42,466 165,466" fill="#f6f3ec"/>
+<g id="rooms">
+<polygon id="salle_de_bain_rdc" class="room" points="191,65 281,65 281,166 191,166" fill="#f6f3ec"/>
+<polygon id="entree_rdc" class="room" points="191,172 281,172 281,320 191,320" fill="#f6f3ec"/>
+<polygon id="bureau_rdc" class="room" points="191,326 294,326 294,460 191,460" fill="#f6f3ec"/>
+<polygon id="salon_rdc" class="room" points="298,65 532,65 532,219 298,219" fill="#f6f3ec"/>
+<polygon id="piece_est" class="room" points="311,237 532,237 532,340 311,340" fill="#f6f3ec"/>
+<polygon id="cave" class="room" points="311,353 532,353 532,460 311,460" fill="#f6f3ec"/>
+<polygon id="hall" class="room" points="62,480 191,480 191,782 110,782 110,658 62,658" fill="#f6f3ec"/>
+<polygon id="garage_nord" class="room" points="208,480 532,480 532,654 208,654" fill="#f6f3ec"/>
+<polygon id="local" class="room" points="191,674 255,674 255,782 191,782" fill="#f6f3ec"/>
+<polygon id="garage_ouest" class="room" points="110,788 255,788 255,942 110,942" fill="#f6f3ec"/>
+<polygon id="sous_sol" class="room" points="275,674 590,674 590,735 275,735" fill="#f6f3ec"/>
+<polygon id="garage_est" class="room" points="275,748 504,748 504,942 275,942" fill="#f6f3ec"/>
+<polygon id="rangement" class="room" points="511,748 590,748 590,942 511,942" fill="#f6f3ec"/>
+</g>
+<g id="walls" fill="#3b3b3b">
+<rect x="165" y="45" width="271" height="20"/>
+<rect x="481" y="45" width="77" height="20"/>
+<rect x="165" y="45" width="19" height="141"/>
+<rect x="165" y="215" width="19" height="44"/>
+<rect x="165" y="299" width="19" height="81"/>
+<rect x="165" y="427" width="19" height="59"/>
+<rect x="538" y="45" width="20" height="633"/>
+<rect x="42" y="466" width="38" height="20"/>
+<rect x="135" y="466" width="230" height="20"/>
+<rect x="397" y="466" width="161" height="20"/>
+<rect x="42" y="466" width="20" height="41"/>
+<rect x="42" y="621" width="20" height="57"/>
+<rect x="42" y="658" width="68" height="20"/>
+<rect x="90" y="658" width="20" height="130"/>
+<rect x="90" y="922" width="20" height="38"/>
+<rect x="90" y="942" width="62" height="18"/>
+<rect x="208" y="942" width="131" height="18"/>
+<rect x="376" y="942" width="234" height="18"/>
+<rect x="590" y="658" width="20" height="302"/>
+<rect x="191" y="658" width="154" height="20"/>
+<rect x="376" y="658" width="234" height="20"/>
+<rect x="281" y="65" width="17" height="114"/>
+<rect x="281" y="212" width="17" height="7"/>
+<rect x="281" y="219" width="257" height="18"/>
+<rect x="294" y="237" width="17" height="22"/>
+<rect x="294" y="306" width="17" height="160"/>
+<rect x="311" y="340" width="227" height="13"/>
+<rect x="184" y="166" width="48" height="4"/>
+<rect x="275" y="166" width="6" height="4"/>
+<rect x="184" y="320" width="26" height="4"/>
+<rect x="247" y="320" width="47" height="4"/>
+<rect x="191" y="486" width="16" height="34"/>
+<rect x="191" y="614" width="16" height="44"/>
+<rect x="255" y="678" width="20" height="110"/>
+<rect x="255" y="882" width="20" height="60"/>
+<rect x="186" y="678" width="5" height="10"/>
+<rect x="186" y="755" width="5" height="27"/>
+<rect x="110" y="782" width="10" height="5"/>
+<rect x="176" y="782" width="79" height="5"/>
+<rect x="275" y="735" width="90" height="13"/>
+<rect x="397" y="735" width="193" height="13"/>
+<rect x="507" y="678" width="5" height="5"/>
+<rect x="507" y="721" width="5" height="14"/>
+<rect x="504" y="748" width="5" height="7"/>
+<rect x="504" y="799" width="5" height="143"/>
+</g>
+<g id="windows" fill="#cfe2ef" stroke="#3b3b3b" stroke-width="1.5">
+<rect x="436" y="45" width="45" height="20"/>
+<rect x="165" y="259" width="19" height="40"/>
+<rect x="165" y="380" width="19" height="47"/>
+<rect x="80" y="466" width="55" height="20"/>
+<rect x="42" y="507" width="20" height="114"/>
+<rect x="90" y="788" width="20" height="134"/>
+<rect x="152" y="942" width="56" height="18"/>
+<rect x="339" y="942" width="37" height="18"/>
+</g>
+<g id="labels" fill="#2e6b5f" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="600" text-anchor="middle" dominant-baseline="middle">
+<text><tspan x="236.0" y="106.5">Salle</tspan><tspan x="236.0" y="124.5">de bain</tspan></text>
+<text><tspan x="236.0" y="246.0">Entrée</tspan></text>
+<text><tspan x="242.5" y="393.0">Bureau</tspan></text>
+<text><tspan x="415.0" y="142.0">Salon</tspan></text>
+<text><tspan x="421.5" y="406.5">Cave</tspan></text>
+<text><tspan x="98" y="560">Hall</tspan></text>
+<text><tspan x="370.0" y="567.0">Garage central</tspan></text>
+<text><tspan x="182.5" y="856.0">Garage</tspan><tspan x="182.5" y="874.0">ouest</tspan></text>
+<text><tspan x="432.5" y="704.5">Sous-sol</tspan></text>
+<text><tspan x="389.5" y="845.0">Garage est</tspan></text>
+</g>
+</svg>

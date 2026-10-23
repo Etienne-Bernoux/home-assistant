@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="540 200 1020 980">
+<polygon id="jardin" points="556,277 1117,227 1300,224 1300,365 1383,447 1531,1102 665,1163" fill="#d3e6bd" stroke="#a9c48f" stroke-width="3"/>
+<polygon id="allee" points="1013,237 1062,233 1022,885 1078,1134 1018,1138 965,890" fill="#cbc4bc"/>
+<rect id="bassin" x="935" y="467" width="38" height="38" rx="4" fill="#9cc3dd" stroke="#6f9cbb" stroke-width="2"/>
+<polygon id="maison" points="1117,224 1300,224 1300,499 1324,499 1324,634 1082,634 1082,508 1060,508 1060,413 1117,413" fill="#3b3b3b"/>
+<g fill="#2e6b5f" font-family="Helvetica, Arial, sans-serif" font-size="30" font-weight="600" text-anchor="middle" dominant-baseline="middle">
+<text x="790" y="720">Jardin</text>
+<text x="1290" y="860">Jardin</text>
+<text x="954" y="535" font-size="22">Bassin</text>
+</g>
+<text x="1205" y="430" fill="#ffffff" font-family="Helvetica, Arial, sans-serif" font-size="30" font-weight="600" text-anchor="middle" dominant-baseline="middle">Maison</text>
+</svg>

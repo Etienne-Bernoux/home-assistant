@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="30 30 600 945">
+<polygon id="floor" points="165,45 558,45 558,658 610,658 610,960 90,960 90,678 42,678 42,466 165,466" fill="#f6f3ec"/>
+<g id="rooms">
+<polygon id="atelier_couture" class="room" points="184,65 282,65 282,264 184,264" fill="#f6f3ec"/>
+<polygon id="placards" class="room" points="184,268 282,268 282,294 184,294" fill="#f6f3ec"/>
+<polygon id="chambre_anatole" class="room" points="184,298 282,298 282,466 184,466" fill="#f6f3ec"/>
+<polygon id="salle_de_jeu" class="room" points="298,65 538,65 538,210 298,210" fill="#f6f3ec"/>
+<polygon id="couloir" class="room" points="298,230 352,230 352,410 400,410 400,466 298,466" fill="#f6f3ec"/>
+<polygon id="salle_de_bain" class="room" points="358,230 444,230 444,338 358,338" fill="#f6f3ec"/>
+<polygon id="annexe" class="room" points="456,230 538,230 538,338 456,338" fill="#f6f3ec"/>
+<polygon id="wc" class="room" points="358,358 400,358 400,406 358,406" fill="#f6f3ec"/>
+<polygon id="chambre_ambroise_aimee" class="room" points="405,358 538,358 538,466 405,466" fill="#f6f3ec"/>
+<polygon id="cuisine" class="room" points="194,486 383,486 383,658 194,658" fill="#f6f3ec"/>
+<polygon id="chambre_parents" class="room" points="388,486 538,486 538,658 388,658" fill="#f6f3ec"/>
+<polygon id="entree" class="room" points="264,678 460,678 460,738 264,738" fill="#f6f3ec"/>
+<polygon id="buanderie" class="room" points="465,678 590,678 590,738 465,738" fill="#f6f3ec"/>
+<polygon id="salon" class="room" points="264,750 590,750 590,942 264,942" fill="#f6f3ec"/>
+<polygon id="terrasse" class="room" points="62,486 174,486 174,678 244,678 244,942 110,942 110,658 62,658" fill="#e6d9b8"/>
+</g>
+<g id="walls" fill="#3b3b3b">
+<rect x="165" y="45" width="291" height="20"/>
+<rect x="486" y="45" width="72" height="20"/>
+<rect x="165" y="45" width="19" height="99"/>
+<rect x="165" y="195" width="19" height="165"/>
+<rect x="165" y="404" width="19" height="82"/>
+<rect x="538" y="45" width="20" height="369"/>
+<rect x="538" y="456" width="20" height="90"/>
+<rect x="538" y="594" width="20" height="84"/>
+<rect x="42" y="466" width="324" height="20"/>
+<rect x="402" y="466" width="136" height="20"/>
+<rect x="42" y="466" width="20" height="212"/>
+<rect x="42" y="658" width="68" height="20"/>
+<rect x="90" y="658" width="20" height="302"/>
+<rect x="90" y="942" width="264" height="18"/>
+<rect x="396" y="942" width="90" height="18"/>
+<rect x="528" y="942" width="82" height="18"/>
+<rect x="174" y="486" width="20" height="60"/>
+<rect x="174" y="606" width="20" height="72"/>
+<rect x="174" y="658" width="168" height="20"/>
+<rect x="384" y="658" width="226" height="20"/>
+<rect x="590" y="658" width="20" height="32"/>
+<rect x="590" y="726" width="20" height="234"/>
+<rect x="244" y="678" width="20" height="12"/>
+<rect x="244" y="726" width="20" height="72"/>
+<rect x="244" y="888" width="20" height="54"/>
+<rect x="264" y="738" width="72" height="12"/>
+<rect x="396" y="738" width="194" height="12"/>
+<rect x="460" y="678" width="5" height="14"/>
+<rect x="460" y="726" width="5" height="12"/>
+<rect x="383" y="486" width="5" height="172"/>
+<rect x="282" y="65" width="16" height="167"/>
+<rect x="282" y="262" width="16" height="128"/>
+<rect x="282" y="420" width="16" height="46"/>
+<rect x="184" y="264" width="98" height="4"/>
+<rect x="184" y="294" width="98" height="4"/>
+<rect x="244" y="268" width="4" height="26"/>
+<rect x="298" y="210" width="20" height="20"/>
+<rect x="366" y="210" width="172" height="20"/>
+<rect x="352" y="230" width="6" height="128"/>
+<rect x="444" y="230" width="12" height="108"/>
+<rect x="352" y="338" width="186" height="20"/>
+<rect x="400" y="358" width="5" height="56"/>
+<rect x="400" y="450" width="5" height="16"/>
+<rect x="358" y="406" width="8" height="4"/>
+<rect x="392" y="406" width="8" height="4"/>
+</g>
+<g id="windows" fill="#cfe2ef" stroke="#3b3b3b" stroke-width="1.5">
+<rect x="456" y="45" width="30" height="20"/>
+<rect x="165" y="144" width="19" height="51"/>
+<rect x="165" y="360" width="19" height="44"/>
+<rect x="538" y="414" width="20" height="42"/>
+<rect x="538" y="546" width="20" height="48"/>
+<rect x="354" y="942" width="42" height="18"/>
+<rect x="486" y="942" width="42" height="18"/>
+<rect x="174" y="546" width="20" height="60"/>
+<rect x="590" y="690" width="20" height="36"/>
+<rect x="244" y="798" width="20" height="90"/>
+</g>
+<g id="labels" fill="#2e6b5f" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="600" text-anchor="middle" dominant-baseline="middle">
+<text><tspan x="233.0" y="155.5">Atelier</tspan><tspan x="233.0" y="173.5">couture</tspan></text>
+<text><tspan x="233.0" y="373.0">Chambre</tspan><tspan x="233.0" y="391.0">d'Anatole</tspan></text>
+<text><tspan x="418.0" y="137.5">Salle de jeu</tspan></text>
+<text><tspan x="325" y="330">Couloir</tspan></text>
+<text><tspan x="401.0" y="275.0">Salle</tspan><tspan x="401.0" y="293.0">de bain</tspan></text>
+<text><tspan x="497.0" y="284.0">Annexe</tspan></text>
+<text><tspan x="379.0" y="382.0">WC</tspan></text>
+<text><tspan x="471.5" y="394.0">Chambre</tspan><tspan x="471.5" y="412.0">Ambroise</tspan><tspan x="471.5" y="430.0">et Aimée</tspan></text>
+<text><tspan x="288.5" y="572.0">Cuisine</tspan></text>
+<text><tspan x="463.0" y="563.0">Chambre</tspan><tspan x="463.0" y="581.0">des parents</tspan></text>
+<text><tspan x="362.0" y="708.0">Entrée</tspan></text>
+<text><tspan x="527.5" y="708.0">Buanderie</tspan></text>
+<text><tspan x="427.0" y="846.0">Salon</tspan></text>
+<text><tspan x="177" y="810">Terrasse</tspan></text>
+</g>
+</svg>

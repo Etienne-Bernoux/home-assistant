@@ -10,6 +10,10 @@ Configuration versionnée d'un Home Assistant domestique (Raspberry Pi 4, Home A
 | `config/packages/mylight_profitability.yaml` | Gain de la batterie virtuelle face à EDF Tarif Bleu, économie de l'installation, dates de retour sur investissement, état de charge de la batterie virtuelle, et puissances de la batterie virtuelle et du réseau facturé, qui partagent la puissance nette mesurée par l'Envoy selon le stock (affichés dans l'onglet Énergie) |
 | `config/packages/notifications.yaml` | Alertes push : sources de données muettes, sauvegarde manquante, redémarrage, sonnette, fenêtre de passage en MSB 100 |
 | `config/dashboards/rentabilite.yaml` | Page Rentabilité |
+| `config/dashboards/maison.yaml` | Page Maison : un onglet par niveau, températures, présence, caméras et aspirateur posés sur le plan |
+| `config/www/plan-etage.svg`, `config/www/plan-rdc.svg`, `config/www/plan-terrain.svg` | Plans vectoriels des deux niveaux et du terrain, une forme identifiée par pièce, servis sans authentification sous `/local/` |
+| `config/www/plan-heatmap.js` | Élément `custom:plan-heatmap` de la page Maison : colore chaque pièce selon sa température (bleu à 16 °C, rouge à 25 °C) et ouvre le capteur au clic |
+| `config/packages/temperature.yaml` | Température moyenne de la maison, affichée dans l'onglet Températures et en favori de l'accueil |
 | `config/custom_templates/mylight.example.jinja` | Catalogue daté des tarifs, forfaits, volumes de référence et investissements, avec des valeurs fictives |
 | `scripts/deploy.sh` | Déploiement sur le Pi avec retour arrière |
 | `scripts/import-battery-history.mjs` | Import de l'historique horaire officiel du stock de la batterie virtuelle depuis l'API MyLight (`HA_URL`, `HA_TOKEN`, identifiants MyLight dans le trousseau macOS, entrée `mylight`) |
@@ -26,11 +30,11 @@ Configuration versionnée d'un Home Assistant domestique (Raspberry Pi 4, Home A
 ./scripts/deploy.sh
 ```
 
-Copie `configuration.yaml`, `packages/`, `custom_components/`, `custom_templates/` et `dashboards/` sur le Pi (ils y sont remplacés en entier), puis lance `ha core check`. La version précédente est gardée dans `/config/.deploy-previous` et remise en place automatiquement si le check échoue ; le script sort alors en erreur. Un nouveau package ou un changement de `configuration.yaml` demande ensuite un redémarrage de Home Assistant ; un changement de template ou d'automatisation se recharge sans redémarrage.
+Copie `configuration.yaml`, `packages/`, `custom_components/`, `custom_templates/`, `dashboards/` et `www/` sur le Pi (ils y sont remplacés en entier), puis lance `ha core check`. La version précédente est gardée dans `/config/.deploy-previous` et remise en place automatiquement si le check échoue ; le script sort alors en erreur. Un nouveau package ou un changement de `configuration.yaml` demande ensuite un redémarrage de Home Assistant ; un changement de template ou d'automatisation se recharge sans redémarrage.
 
 ## Ce qui n'est pas dans ce dépôt
 
-Les intégrations (Enphase, MyLight, Ring, Google Drive, Tailscale), le tableau Énergie, les sauvegardes automatiques et les réglages du serveur HTTP sont configurés dans l'interface et stockés dans `.storage/`. Les sauvegardes quotidiennes chiffrées, sur le Pi et sur Google Drive, les couvrent.
+Les intégrations (Enphase, MyLight, Ring, Google Drive, Tailscale), les étages et les pièces, la ressource Lovelace `/local/plan-heatmap.js?v=N` (à incrémenter à chaque modification du fichier), les favoris de l'accueil, le tableau Énergie, les sauvegardes automatiques et les réglages du serveur HTTP sont configurés dans l'interface et stockés dans `.storage/`. Les sauvegardes quotidiennes chiffrées, sur le Pi et sur Google Drive, les couvrent.
 
 ## Règles
 
