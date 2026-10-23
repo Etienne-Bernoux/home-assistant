@@ -168,3 +168,28 @@ template:
           {% from 'mylight.jinja' import msb_forfaits %}
           {% set forfait = msb_forfaits() | from_json | selectattr('from', '<=', now().date() | string) | list | last %}
           {{ ([states('sensor.mylight_systems_energie_stockee_en_batterie') | float / forfait.kwh * 100, 100] | min) | round(1) }}
+      - name: Puissance batterie virtuelle
+        unique_id: mylight_virtual_battery_power
+        unit_of_measurement: kW
+        device_class: power
+        state_class: measurement
+        availability: >
+          {{ states('sensor.envoy_122333060519_consommation_nette_de_puissance_actuelle') | is_number
+             and states('sensor.mylight_systems_energie_stockee_en_batterie') | is_number }}
+        state: >
+          {% from 'mylight.jinja' import msb_forfaits %}
+          {% set forfait = msb_forfaits() | from_json | selectattr('from', '<=', now().date() | string) | list | last %}
+          {% set net = states('sensor.envoy_122333060519_consommation_nette_de_puissance_actuelle') | float %}
+          {% set stock = states('sensor.mylight_systems_energie_stockee_en_batterie') | float %}
+          {{ (net if (net > 0 and stock > 0) or (net < 0 and stock < forfait.kwh) else 0) | round(3) }}
+      - name: Puissance réseau facturée
+        unique_id: mylight_billed_grid_power
+        unit_of_measurement: kW
+        device_class: power
+        state_class: measurement
+        availability: >
+          {{ states('sensor.envoy_122333060519_consommation_nette_de_puissance_actuelle') | is_number
+             and states('sensor.puissance_batterie_virtuelle') | is_number }}
+        state: >
+          {{ (states('sensor.envoy_122333060519_consommation_nette_de_puissance_actuelle') | float
+              - states('sensor.puissance_batterie_virtuelle') | float) | round(3) }}
