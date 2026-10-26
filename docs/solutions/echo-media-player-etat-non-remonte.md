@@ -21,4 +21,4 @@ Une automatisation peut lancer ou arrêter la lecture d'un Echo, mais elle ne pe
 - Lancer, arrêter ou mettre en pause : `alexa_devices.send_text_command`, avec le `device_id` de l'Echo (`{{ device_id('media_player.echo_bureau') }}`) et la phrase qu'on dirait à voix haute (« stop », « pause »).
 - Parler : `notify.<echo>_annoncer` (avec carillon) ou `notify.<echo>_parler`, qui existent pour les quatre Echo.
 
-Testé sur Amazon Music le 2026-10-26. Pour Audible (« lis mon livre audio sur Audible »), la commande est acceptée, mais la lecture n'a pas été confirmée à l'oreille.
+Testé le 2026-10-26 sur l'Echo du bureau, avec Amazon Music (« joue de la musique sur Amazon Music ») et Audible (« lis mon livre audio sur Audible ») : les deux ont joué, et le `media_player` est resté `idle` dans les deux cas.
