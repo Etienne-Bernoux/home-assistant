@@ -1,0 +1,48 @@
+{% macro evening_advice(forecast, now, heat, frost, rain) -%}
+{%- set start = (now | as_datetime | as_local).replace(hour=20, minute=0, second=0, microsecond=0) -%}
+{%- set tomorrow = (start + timedelta(days=1)).date() -%}
+{%- set ns = namespace(max=none, min=none, wet=false) -%}
+{%- for entry in forecast -%}
+  {%- set at = entry.datetime | as_datetime | as_local -%}
+  {%- if at.date() == tomorrow and (ns.max is none or entry.temperature > ns.max) -%}
+    {%- set ns.max = entry.temperature -%}
+  {%- endif -%}
+  {%- if start <= at <= start + timedelta(hours=12) and (ns.min is none or entry.temperature < ns.min) -%}
+    {%- set ns.min = entry.temperature -%}
+  {%- endif -%}
+  {%- if start <= at <= start + timedelta(hours=11) and entry.precipitation >= rain -%}
+    {%- set ns.wet = true -%}
+  {%- endif -%}
+{%- endfor -%}
+{%- set consignes = (['volets'] if ns.max is not none and ns.max >= heat else [])
+  + (['linge'] if ns.wet else [])
+  + (['gel'] if ns.min is not none and ns.min <= frost else []) -%}
+{{ {'consignes': consignes, 'max': (ns.max | round(0) | int) if ns.max is not none else none} | to_json }}
+{%- endmacro %}
+
+{% macro rain_reminder(forecast, now, rain, last_rain) -%}
+{%- set hour = ((now | as_datetime | as_local) + timedelta(minutes=5)).replace(minute=0, second=0, microsecond=0) -%}
+{%- set ns = namespace(wet=[], start=none, found=false) -%}
+{%- for entry in forecast if entry.precipitation >= rain -%}
+  {%- set ns.wet = ns.wet + [entry.datetime | as_datetime | as_local] -%}
+{%- endfor -%}
+{%- set last = as_datetime(last_rain, none) -%}
+{%- set last = (last | as_local) if last is not none else none -%}
+{%- set offsets = [0, 1, 2] if hour.hour == 8 else ([2] if 9 <= hour.hour <= 17 else []) -%}
+{%- for offset in offsets -%}
+  {%- set candidate = hour + timedelta(hours=offset) -%}
+  {%- if not ns.found and candidate in ns.wet -%}
+    {%- set ns.found = true -%}
+    {%- set no_rain_before = ns.wet | select('ge', hour) | select('lt', candidate) | list | count == 0 -%}
+    {%- if no_rain_before and (last is none or last < candidate - timedelta(hours=3)) -%}
+      {%- set ns.start = candidate -%}
+    {%- endif -%}
+  {%- endif -%}
+{%- endfor -%}
+{%- set memory = hour if hour in ns.wet else last -%}
+{{ {
+  'start': ns.start.isoformat() if ns.start is not none else none,
+  'start_hour': ns.start.hour if ns.start is not none else none,
+  'last_rain': memory.strftime('%Y-%m-%d %H:%M:%S') if memory is not none else ''
+} | to_json }}
+{%- endmacro %}

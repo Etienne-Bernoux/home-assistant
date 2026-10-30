@@ -14,9 +14,12 @@ Configuration versionnée d'un Home Assistant domestique (Raspberry Pi 4, Home A
 | `config/www/plan-etage.svg`, `config/www/plan-rdc.svg`, `config/www/plan-terrain.svg` | Plans vectoriels des deux niveaux et du terrain, une forme identifiée par pièce, servis sans authentification sous `/local/` |
 | `config/www/plan-heatmap.js` | Élément `custom:plan-heatmap` de la page Maison : colore chaque pièce selon sa température (bleu à 16 °C, rouge à 25 °C) et ouvre le capteur au clic |
 | `config/packages/temperature.yaml` | Température moyenne de la maison, affichée dans l'onglet Températures et en favori de l'accueil |
+| `config/packages/weather_advice.yaml` | Consignes météo vocales sur l'appareil choisi (Partout par défaut, un Echo ou le téléphone) : à 20 h volets, linge et gel selon la prévision Met.no, et en journée un rappel 2 h avant la pluie ; seuils réglables dans l'onglet Températures |
+| `config/custom_templates/weather_advice.jinja` | Décision des consignes météo à partir de la prévision horaire, sans effet de bord |
 | `config/custom_templates/mylight.example.jinja` | Catalogue daté des tarifs, forfaits, volumes de référence et investissements, avec des valeurs fictives |
 | `scripts/deploy.sh` | Déploiement sur le Pi avec retour arrière |
 | `scripts/import-battery-history.mjs` | Import de l'historique horaire officiel du stock de la batterie virtuelle depuis l'API MyLight (`HA_URL`, `HA_TOKEN`, identifiants MyLight dans le trousseau macOS, entrée `mylight`) |
+| `scripts/test-weather-advice.mjs` | Tests de `weather_advice.jinja` sur le Pi avec des prévisions fabriquées (`HA_URL`, `HA_TOKEN`) |
 
 ## Installer
 
@@ -31,6 +34,12 @@ Configuration versionnée d'un Home Assistant domestique (Raspberry Pi 4, Home A
 ```
 
 Copie `configuration.yaml`, `packages/`, `custom_components/`, `custom_templates/`, `dashboards/` et `www/` sur le Pi (ils y sont remplacés en entier), puis lance `ha core check`. La version précédente est gardée dans `/config/.deploy-previous` et remise en place automatiquement si le check échoue ; le script sort alors en erreur. Un nouveau package ou un changement de `configuration.yaml` demande ensuite un redémarrage de Home Assistant ; un changement de template ou d'automatisation se recharge sans redémarrage.
+
+Après le premier redémarrage qui crée `weather_advice.yaml`, régler les trois seuils dans l'onglet Températures (28 °C, 1 °C, 0,5 mm) : sans valeur posée, ils partent du minimum de leur plage. Après une modification de `weather_advice.jinja`, recharger les templates personnalisés (`homeassistant.reload_custom_templates`) puis lancer les tests :
+
+```bash
+HA_URL=http://192.168.1.250 HA_TOKEN=… node scripts/test-weather-advice.mjs
+```
 
 ## Ce qui n'est pas dans ce dépôt
 

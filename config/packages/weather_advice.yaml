@@ -1,0 +1,154 @@
+input_number:
+  meteo_seuil_chaleur:
+    name: Seuil volets
+    icon: mdi:window-shutter
+    min: 20
+    max: 40
+    step: 1
+    unit_of_measurement: °C
+    mode: box
+  meteo_seuil_gel:
+    name: Seuil gel
+    icon: mdi:snowflake-alert
+    min: -5
+    max: 5
+    step: 0.5
+    unit_of_measurement: °C
+    mode: box
+  meteo_seuil_pluie:
+    name: Seuil pluie
+    icon: mdi:weather-rainy
+    min: 0.1
+    max: 5
+    step: 0.1
+    unit_of_measurement: mm
+    mode: box
+
+input_select:
+  meteo_appareil:
+    name: Annoncer sur
+    icon: mdi:bullhorn
+    options:
+      - Partout
+      - Bureau
+      - Salon
+      - Cuisine
+      - Salle de jeu
+      - Téléphone
+
+input_datetime:
+  meteo_derniere_pluie:
+    name: Dernière heure de pluie
+    icon: mdi:weather-pouring
+    has_date: true
+    has_time: true
+
+script:
+  meteo_annoncer:
+    alias: Annoncer une consigne météo
+    icon: mdi:bullhorn
+    mode: queued
+    fields:
+      message:
+        name: Message
+        selector:
+          text:
+    variables:
+      cibles:
+        Partout: notify.partout_annoncer
+        Bureau: notify.echo_bureau_annoncer
+        Salon: notify.echo_dot_salon_annoncer
+        Cuisine: notify.echo_dot_cuisine_annoncer
+        Salle de jeu: notify.4eme_echo_dot_etienne_annoncer
+        Téléphone: notify.pixel_6
+    sequence:
+      - action: notify.send_message
+        target:
+          entity_id: "{{ cibles[states('input_select.meteo_appareil')] }}"
+        data:
+          message: "{{ message }}"
+
+automation:
+  - id: weather_advice_evening
+    alias: Annoncer les consignes météo du soir
+    mode: single
+    triggers:
+      - trigger: time
+        at: "19:58:00"
+    actions:
+      - action: weather.get_forecasts
+        target:
+          entity_id: weather.forecast_maison
+        data:
+          type: hourly
+        response_variable: prevision
+        continue_on_error: true
+      - delay:
+          seconds: >
+            {% set wait = (today_at('20:00') - now()).total_seconds() %}
+            {{ wait | int if 0 < wait <= 300 else 0 }}
+      - if:
+          - condition: template
+            value_template: >
+              {{ prevision is not defined
+                 or prevision.get('weather.forecast_maison', {}).get('forecast', []) | count == 0 }}
+        then:
+          - action: script.meteo_annoncer
+            data:
+              message: Prévisions météo indisponibles, consignes non vérifiées ce soir.
+          - stop: Prévisions indisponibles
+      - variables:
+          advice: >
+            {% from 'weather_advice.jinja' import evening_advice %}
+            {{ evening_advice(prevision['weather.forecast_maison'].forecast, now().isoformat(),
+                              states('input_number.meteo_seuil_chaleur') | float,
+                              states('input_number.meteo_seuil_gel') | float,
+                              states('input_number.meteo_seuil_pluie') | float) | from_json }}
+          message: >
+            {% set phrases = {
+                 'volets': 'Demain il fera ' ~ advice.max ~ ' degrés, ferme les volets ce soir.',
+                 'linge': 'Il va pleuvoir cette nuit, rentre le linge.',
+                 'gel': 'Gel prévu cette nuit, protège le robinet extérieur.'} %}
+            {% for consigne in advice.consignes %}{{ phrases[consigne] }} {% endfor %}
+      - condition: template
+        value_template: "{{ advice.consignes | count > 0 }}"
+      - action: script.meteo_annoncer
+        data:
+          message: "{{ message }}"
+
+  - id: weather_advice_rain
+    alias: Rappeler de rentrer le linge avant la pluie
+    mode: single
+    triggers:
+      - trigger: time_pattern
+        minutes: 58
+    actions:
+      - action: weather.get_forecasts
+        target:
+          entity_id: weather.forecast_maison
+        data:
+          type: hourly
+        response_variable: prevision
+      - variables:
+          reminder: >
+            {% from 'weather_advice.jinja' import rain_reminder %}
+            {{ rain_reminder(prevision['weather.forecast_maison'].forecast, now().isoformat(),
+                             states('input_number.meteo_seuil_pluie') | float,
+                             states('input_datetime.meteo_derniere_pluie')) | from_json }}
+      - if:
+          - condition: template
+            value_template: >
+              {{ reminder.last_rain not in ['', states('input_datetime.meteo_derniere_pluie')] }}
+        then:
+          - action: input_datetime.set_datetime
+            target:
+              entity_id: input_datetime.meteo_derniere_pluie
+            data:
+              datetime: "{{ reminder.last_rain }}"
+      - condition: template
+        value_template: "{{ reminder.start is not none }}"
+      - delay:
+          seconds: "{{ (60 - now().minute) * 60 - now().second if now().minute >= 55 else 0 }}"
+      - action: script.meteo_annoncer
+        data:
+          message: "Pluie prévue vers {{ reminder.start_hour }} heures, rentre le linge."

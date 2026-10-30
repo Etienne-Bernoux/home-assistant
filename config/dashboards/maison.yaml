@@ -358,6 +358,20 @@ views:
                 name: Bureau
               - entity: sensor.salle_de_jeu_temperature
                 name: Salle de jeu
+      - type: grid
+        cards:
+          - type: heading
+            heading: Consignes météo
+            icon: mdi:weather-partly-rainy
+          - type: entities
+            entities:
+              - entity: input_select.meteo_appareil
+              - entity: input_number.meteo_seuil_chaleur
+                name: Volets si demain atteint
+              - entity: input_number.meteo_seuil_gel
+                name: Robinet si la nuit descend à
+              - entity: input_number.meteo_seuil_pluie
+                name: Pluie à partir de
   - title: Musique
     path: musique
     icon: mdi:music
