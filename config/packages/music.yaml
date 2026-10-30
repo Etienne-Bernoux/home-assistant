@@ -1,0 +1,46 @@
+input_select:
+  musique_piece:
+    name: Pièce de lecture
+    icon: mdi:speaker-multiple
+    options:
+      - Bureau
+      - Salon
+      - Cuisine
+      - Salle de jeu
+      - Partout
+
+input_text:
+  musique_demande:
+    name: Autre demande
+    icon: mdi:text-search
+    max: 100
+
+script:
+  musique_lancer:
+    alias: Lancer une musique ou un livre sur un Echo
+    icon: mdi:play-circle
+    mode: restart
+    fields:
+      commande:
+        name: Commande
+        description: Phrase dite à Alexa ; à défaut, le champ Autre demande.
+        example: joue du jazz sur Amazon Music
+        selector:
+          text:
+    variables:
+      lecteurs:
+        Bureau: media_player.echo_bureau
+        Salon: media_player.echo_dot_salon
+        Cuisine: media_player.echo_dot_cuisine
+        Salle de jeu: media_player.4eme_echo_dot_etienne
+        Partout: media_player.partout
+      texte: "{{ (commande | default(states('input_text.musique_demande'), true)) | trim }}"
+      demande: "{{ texte if texte | lower is match('(joue|lis|mets) ') else 'joue ' ~ texte }}"
+      lecteur: "{{ lecteurs[states('input_select.musique_piece')] }}"
+    sequence:
+      - condition: template
+        value_template: "{{ texte | length > 0 }}"
+      - action: alexa_devices.send_text_command
+        data:
+          device_id: "{{ device_id(lecteur) }}"
+          text_command: "{{ demande }}"
