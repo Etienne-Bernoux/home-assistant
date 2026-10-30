@@ -11,9 +11,11 @@ Configuration versionnée d'un Home Assistant domestique (Raspberry Pi 4, Home A
 | `config/packages/notifications.yaml` | Alertes push : sources de données muettes, sauvegarde manquante, redémarrage, sonnette, fenêtre de passage en MSB 100 |
 | `config/dashboards/rentabilite.yaml` | Page Rentabilité |
 | `config/dashboards/maison.yaml` | Page Maison : un onglet par niveau, températures, présence, caméras et aspirateur posés sur le plan |
+| `config/dashboards/musique.yaml` | Page Musique : choix de la pièce, favoris Amazon Music, radio et Audible lancés sur les Echo, lecture en cours et volume par Echo |
 | `config/www/plan-etage.svg`, `config/www/plan-rdc.svg`, `config/www/plan-terrain.svg` | Plans vectoriels des deux niveaux et du terrain, une forme identifiée par pièce, servis sans authentification sous `/local/` |
 | `config/www/plan-heatmap.js` | Élément `custom:plan-heatmap` de la page Maison : colore chaque pièce selon sa température (bleu à 16 °C, rouge à 25 °C) et ouvre le capteur au clic |
 | `config/packages/temperature.yaml` | Température moyenne de la maison, affichée dans l'onglet Températures et en favori de l'accueil |
+| `config/packages/music.yaml` | Lancement d'une demande Alexa (musique, radio, livre audio) sur l'Echo de la pièce choisie, utilisé par la page Musique |
 | `config/packages/weather_advice.yaml` | Consignes météo vocales sur l'appareil choisi (Partout par défaut, un Echo ou le téléphone) : à 20 h volets, linge et gel selon la prévision Met.no, et en journée un rappel 2 h avant la pluie ; seuils réglables dans l'onglet Températures |
 | `config/custom_templates/weather_advice.jinja` | Décision des consignes météo à partir de la prévision horaire, sans effet de bord |
 | `config/custom_templates/mylight.example.jinja` | Catalogue daté des tarifs, forfaits, volumes de référence et investissements, avec des valeurs fictives |
