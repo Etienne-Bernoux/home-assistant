@@ -26,7 +26,7 @@ Configuration versionnée d'un Home Assistant domestique (Raspberry Pi 4, Home A
 ## Installer
 
 1. Copier `config/custom_templates/mylight.example.jinja` en `config/custom_templates/mylight.jinja` et y mettre ses propres valeurs. Le vrai catalogue reste hors git.
-2. Installer l'intégration MyLight Systems dans `config/custom_components/mylight_systems` depuis le tag v0.10.0 du dépôt [acesyde/hassio_mylight_integration](https://github.com/acesyde/hassio_mylight_integration). Elle n'est pas redistribuée ici.
+2. Installer l'intégration MyLight Systems par le Marketplace de Home Assistant (Paramètres > Marketplace, dépôt `acesyde/hassio_mylight_integration`, présent au catalogue), puis redémarrer. Elle n'est pas redistribuée ici.
 3. Déclarer un hôte SSH `ha` vers l'add-on Terminal & SSH du Pi.
 
 ## Déployer
@@ -35,7 +35,7 @@ Configuration versionnée d'un Home Assistant domestique (Raspberry Pi 4, Home A
 ./scripts/deploy.sh
 ```
 
-Copie `configuration.yaml`, `packages/`, `custom_components/`, `custom_templates/`, `dashboards/` et `www/` sur le Pi (ils y sont remplacés en entier), puis lance `ha core check`. La version précédente est gardée dans `/config/.deploy-previous` et remise en place automatiquement si le check échoue ; le script sort alors en erreur. Un nouveau package ou un changement de `configuration.yaml` demande ensuite un redémarrage de Home Assistant ; un changement de template ou d'automatisation se recharge sans redémarrage.
+Copie `configuration.yaml`, `packages/`, `custom_templates/`, `dashboards/` et `www/` sur le Pi (ils y sont remplacés en entier, sauf `www/community/`, réservé au Marketplace ; `custom_components/` n'est pas touché), puis lance `ha core check`. La version précédente est gardée dans `/config/.deploy-previous` et remise en place automatiquement si le check échoue ; le script sort alors en erreur. Un nouveau package ou un changement de `configuration.yaml` demande ensuite un redémarrage de Home Assistant ; un changement de template ou d'automatisation se recharge sans redémarrage.
 
 Après le premier redémarrage qui crée `weather_advice.yaml`, régler les trois seuils dans l'onglet Températures (28 °C, 1 °C, 0,5 mm) : sans valeur posée, ils partent du minimum de leur plage. Après une modification de `weather_advice.jinja`, recharger les templates personnalisés (`homeassistant.reload_custom_templates`) puis lancer les tests :
 
@@ -45,10 +45,10 @@ HA_URL=http://192.168.1.250 HA_TOKEN=… node scripts/test-weather-advice.mjs
 
 ## Ce qui n'est pas dans ce dépôt
 
-Les intégrations (Enphase, MyLight, Ring, Google Drive, Tailscale), les étages et les pièces, la ressource Lovelace `/local/plan-heatmap.js?v=N` (à incrémenter à chaque modification du fichier), les favoris de l'accueil, le tableau Énergie, les sauvegardes automatiques et les réglages du serveur HTTP sont configurés dans l'interface et stockés dans `.storage/`. Les sauvegardes quotidiennes chiffrées, sur le Pi et sur Google Drive, les couvrent.
+Les intégrations (Enphase, MyLight, Ring, Google Drive, Tailscale), le contenu installé par le Marketplace (`custom_components/`, `www/community/`), les étages et les pièces, la ressource Lovelace `/local/plan-heatmap.js?v=N` (à incrémenter à chaque modification du fichier), les favoris de l'accueil, le tableau Énergie, les sauvegardes automatiques et les réglages du serveur HTTP sont configurés dans l'interface et stockés dans `.storage/`. Les sauvegardes quotidiennes chiffrées, sur le Pi et sur Google Drive, les couvrent.
 
 ## Règles
 
-- **MyLight** : ne jamais activer le niveau de log `debug` pour cette intégration, il écrit le mot de passe MyLight dans `home-assistant.log` ; ne pas utiliser son service d'export CSV, il dépose le fichier dans `/config/www/`, servi sans authentification. Mises à jour à suivre à la main sur les tags du dépôt amont.
+- **MyLight** : ne jamais activer le niveau de log `debug` pour cette intégration, il écrit le mot de passe MyLight dans `home-assistant.log` ; ne pas utiliser son service d'export CSV, il dépose le fichier dans `/config/www/`, servi sans authentification. Ses mises à jour arrivent par le Marketplace (Paramètres > Mises à jour) : lire le changelog du dépôt amont avant d'installer, puis redémarrer.
 - **Page Rentabilité** : à chaque changement de forfait MySmartBattery ou de prix, ajouter une ligne datée dans `mylight.jinja` (`ml_tariffs`, ou `msb_forfaits` avec la capacité du palier en `kwh`), sans toucher aux lignes passées, puis recharger les templates personnalisés. Mettre à jour `reference_year` chaque automne avec les volumes des 12 derniers mois.
 - **Tableau Énergie** : achats et réinjection viennent de MyLight, la batterie virtuelle aussi (charge et décharge), le solaire de l'Envoy. L'historique antérieur à la mise en service est horaire : les totaux journaliers (Enphase pour le solaire, MyLight pour le reste) répartis heure par heure selon le profil horaire de l'API MyLight ; les heures absentes chez MyLight reportent leur énergie sur l'heure suivante.
