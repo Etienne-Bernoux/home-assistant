@@ -8,7 +8,7 @@ Configuration versionnée d'un Home Assistant domestique (Raspberry Pi 4, Home A
 |---|---|
 | `config/packages/energy_tariff.yaml` | Plages d'heures creuses et prix du kWh en vigueur |
 | `config/packages/mylight_profitability.yaml` | Gain de la batterie virtuelle face à EDF Tarif Bleu, économie de l'installation, dates de retour sur investissement, état de charge de la batterie virtuelle, et puissances de la batterie virtuelle et du réseau facturé, qui partagent la puissance nette mesurée par l'Envoy selon le stock (affichés dans l'onglet Énergie) |
-| `config/packages/notifications.yaml` | Alertes push : sources de données muettes, sauvegarde manquante, redémarrage, sonnette, fenêtre de passage en MSB 100 |
+| `config/packages/notifications.yaml` | Alertes push : sources de données muettes, sauvegarde manquante, redémarrage, sonnette |
 | `config/dashboards/rentabilite.yaml` | Page Rentabilité |
 | `config/dashboards/maison.yaml` | Page Maison : un onglet par niveau, températures, présence, caméras et aspirateur posés sur le plan |
 | `config/dashboards/musique.yaml` | Page Musique : choix de la pièce, favoris Amazon Music, radio et Audible lancés sur les Echo, lecture en cours et volume par Echo |

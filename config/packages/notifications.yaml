@@ -70,24 +70,6 @@ automation:
               Aucune sauvegarde réussie depuis plus de 26 heures.
             {% endif %}
 
-  - id: notify_msb_100_switch
-    alias: Prévenir quand le stock virtuel permet de passer en MSB 100
-    mode: single
-    triggers:
-      - trigger: numeric_state
-        entity_id: sensor.mylight_systems_energie_stockee_en_batterie
-        below: 100
-    conditions:
-      - condition: template
-        value_template: "{{ trigger.from_state.state | is_number }}"
-    actions:
-      - action: notify.mobile_app_pixel_6
-        data:
-          title: Passer en MySmartBattery 100
-          message: >
-            Stock virtuel à {{ trigger.to_state.state | float | round(0) | int }} kWh :
-            le passage en MSB 100 ne fait plus perdre de stock. À demander à MyLight150.
-
   - id: notify_home_assistant_started
     alias: Prévenir quand Home Assistant redémarre
     mode: single
