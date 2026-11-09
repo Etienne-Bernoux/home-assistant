@@ -342,6 +342,8 @@ views:
                 name: Bureau
               - entity: sensor.salle_de_jeu_temperature
                 name: Salle de jeu
+              - entity: binary_sensor.poele
+                name: Poêle
       - type: grid
         cards:
           - type: heading
