@@ -37,4 +37,5 @@ template:
         state: >
           {% set gap = states('sensor.echo_dot_cuisine_temperature') | float
                        - states('sensor.echo_dot_salon_temperature') | float %}
-          {{ gap >= 4 or (this.state == 'on' and gap >= 3) }}
+          {% set outdoor = state_attr('weather.forecast_maison', 'temperature') | float(0) %}
+          {{ (gap >= 4 and outdoor < 18) or (this.state == 'on' and gap >= 3) }}
