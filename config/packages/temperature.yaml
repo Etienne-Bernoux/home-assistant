@@ -1,3 +1,14 @@
+sensor:
+  - platform: statistics
+    name: Hausse température cuisine
+    unique_id: kitchen_temperature_rise
+    entity_id: sensor.echo_dot_cuisine_temperature
+    state_characteristic: change
+    max_age:
+      hours: 1
+    sampling_size: 100
+    keep_last_sample: true
+
 template:
   - sensor:
       - name: Température cuisine
@@ -8,10 +19,11 @@ template:
         state_class: measurement
         availability: >
           {{ ['sensor.echo_dot_cuisine_temperature', 'sensor.h5075_c055_temperature']
-             | map('states') | select('is_number') | list | count > 0 }}
+             | map('states') | select('is_number') | map('float') | select('gt', -40) | list | count > 0 }}
         state: >
           {{ ['sensor.echo_dot_cuisine_temperature', 'sensor.h5075_c055_temperature']
-             | map('states') | select('is_number') | map('float') | list | average | round(1) }}
+             | map('states') | select('is_number') | map('float') | select('gt', -40)
+             | list | average | round(1) }}
       - name: Température moyenne maison
         unique_id: temperature_moyenne_maison
         icon: mdi:home-thermometer
@@ -21,21 +33,38 @@ template:
         availability: >
           {{ ['sensor.echo_dot_salon_temperature', 'sensor.temperature_cuisine',
               'sensor.echo_bureau_temperature',
-              'sensor.salle_de_jeu_temperature'] | map('states') | select('is_number') | list | count > 0 }}
+              'sensor.salle_de_jeu_temperature'] | map('states') | select('is_number') | map('float')
+             | select('gt', -40) | list | count > 0 }}
         state: >
           {{ ['sensor.echo_dot_salon_temperature', 'sensor.temperature_cuisine',
               'sensor.echo_bureau_temperature',
               'sensor.salle_de_jeu_temperature'] | map('states') | select('is_number') | map('float')
-             | list | average | round(1) }}
+             | select('gt', -40) | list | average | round(1) }}
+      - name: Poêle allumé
+        unique_id: poele_activite
+        icon: mdi:fireplace
+        unit_of_measurement: "%"
+        state_class: measurement
+        availability: "{{ states('binary_sensor.poele') in ['on', 'off'] }}"
+        state: "{{ 100 if is_state('binary_sensor.poele', 'on') else 0 }}"
   - binary_sensor:
       - name: Poêle
         unique_id: poele_allume
         device_class: heat
-        availability: >
-          {{ states('sensor.echo_dot_cuisine_temperature') | is_number
-             and states('sensor.echo_dot_salon_temperature') | is_number }}
         state: >
-          {% set gap = states('sensor.echo_dot_cuisine_temperature') | float
-                       - states('sensor.echo_dot_salon_temperature') | float %}
-          {% set outdoor = state_attr('weather.forecast_maison', 'temperature') | float(0) %}
-          {{ (gap >= 4 and outdoor < 18) or (this.state == 'on' and gap >= 3) }}
+          {% set c = states('sensor.echo_dot_cuisine_temperature') | float(none) %}
+          {% set s = states('sensor.echo_dot_salon_temperature') | float(none) %}
+          {% if c is none or s is none or not (-40 < c < 60 and -40 < s < 60) %}
+            {{ this.state == 'on' }}
+          {% else %}
+            {% set gap = c - s %}
+            {% set rise = states('sensor.hausse_temperature_cuisine') | float(0) %}
+            {% set outdoor = state_attr('weather.forecast_maison', 'temperature') | float(0) %}
+            {% if this.state == 'on' %}
+              {{ gap >= 3 }}
+            {% elif this.state == 'off' %}
+              {{ 2 <= rise < 20 and gap >= 3 and outdoor < 18 }}
+            {% else %}
+              {{ gap >= 4 and outdoor < 18 }}
+            {% endif %}
+          {% endif %}

@@ -342,8 +342,6 @@ views:
                 name: Bureau
               - entity: sensor.salle_de_jeu_temperature
                 name: Salle de jeu
-              - entity: binary_sensor.poele
-                name: Poêle
       - type: grid
         cards:
           - type: heading
@@ -366,6 +364,20 @@ views:
                 name: Bureau
               - entity: sensor.salle_de_jeu_temperature
                 name: Salle de jeu
+      - type: grid
+        cards:
+          - type: heading
+            heading: Poêle, 7 derniers jours
+            icon: mdi:fireplace
+          - type: statistics-graph
+            period: hour
+            days_to_show: 7
+            stat_types:
+              - mean
+            chart_type: bar
+            entities:
+              - entity: sensor.poele_allume
+                name: Part de l'heure allumé
       - type: grid
         cards:
           - type: heading
