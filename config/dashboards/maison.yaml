@@ -14,7 +14,7 @@ views:
               - type: custom:plan-heatmap
                 plan: /local/plan-etage.svg?v=3
                 rooms:
-                  cuisine: sensor.echo_dot_cuisine_temperature
+                  cuisine: sensor.temperature_cuisine
                   salon: sensor.echo_dot_salon_temperature
                   salle_de_jeu: sensor.salle_de_jeu_temperature
                 style:
@@ -23,7 +23,7 @@ views:
                   width: 100%
                   height: 100%
               - type: state-label
-                entity: sensor.echo_dot_cuisine_temperature
+                entity: sensor.temperature_cuisine
                 style:
                   top: 61.4%
                   left: 36.7%
@@ -330,7 +330,7 @@ views:
                 name: Moyenne
               - entity: sensor.echo_dot_salon_temperature
                 name: Salon
-              - entity: sensor.echo_dot_cuisine_temperature
+              - entity: sensor.temperature_cuisine
                 name: Cuisine
               - entity: sensor.echo_bureau_temperature
                 name: Bureau
@@ -352,7 +352,7 @@ views:
                 name: Moyenne
               - entity: sensor.echo_dot_salon_temperature
                 name: Salon
-              - entity: sensor.echo_dot_cuisine_temperature
+              - entity: sensor.temperature_cuisine
                 name: Cuisine
               - entity: sensor.echo_bureau_temperature
                 name: Bureau

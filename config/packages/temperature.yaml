@@ -1,5 +1,17 @@
 template:
   - sensor:
+      - name: Température cuisine
+        unique_id: temperature_cuisine
+        icon: mdi:thermometer
+        unit_of_measurement: "°C"
+        device_class: temperature
+        state_class: measurement
+        availability: >
+          {{ ['sensor.echo_dot_cuisine_temperature', 'sensor.h5075_c055_temperature']
+             | map('states') | select('is_number') | list | count > 0 }}
+        state: >
+          {{ ['sensor.echo_dot_cuisine_temperature', 'sensor.h5075_c055_temperature']
+             | map('states') | select('is_number') | map('float') | list | average | round(1) }}
       - name: Température moyenne maison
         unique_id: temperature_moyenne_maison
         icon: mdi:home-thermometer
@@ -7,11 +19,11 @@ template:
         device_class: temperature
         state_class: measurement
         availability: >
-          {{ ['sensor.echo_dot_salon_temperature', 'sensor.echo_dot_cuisine_temperature',
+          {{ ['sensor.echo_dot_salon_temperature', 'sensor.temperature_cuisine',
               'sensor.echo_bureau_temperature',
               'sensor.salle_de_jeu_temperature'] | map('states') | select('is_number') | list | count > 0 }}
         state: >
-          {{ ['sensor.echo_dot_salon_temperature', 'sensor.echo_dot_cuisine_temperature',
+          {{ ['sensor.echo_dot_salon_temperature', 'sensor.temperature_cuisine',
               'sensor.echo_bureau_temperature',
               'sensor.salle_de_jeu_temperature'] | map('states') | select('is_number') | map('float')
              | list | average | round(1) }}
