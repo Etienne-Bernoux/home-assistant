@@ -32,6 +32,12 @@ views:
                 style:
                   top: 61.4%
                   left: 46.7%
+              - type: state-icon
+                entity: binary_sensor.poele
+                icon: mdi:fireplace
+                style:
+                  top: 65.8%
+                  left: 50%
               - type: conditional
                 conditions:
                   - entity: vacuum.qrevo_s_pro_series

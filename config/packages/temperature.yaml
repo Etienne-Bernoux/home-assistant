@@ -27,3 +27,14 @@ template:
               'sensor.echo_bureau_temperature',
               'sensor.salle_de_jeu_temperature'] | map('states') | select('is_number') | map('float')
              | list | average | round(1) }}
+  - binary_sensor:
+      - name: Poêle
+        unique_id: poele_allume
+        device_class: heat
+        availability: >
+          {{ states('sensor.echo_dot_cuisine_temperature') | is_number
+             and states('sensor.echo_dot_salon_temperature') | is_number }}
+        state: >
+          {% set gap = states('sensor.echo_dot_cuisine_temperature') | float
+                       - states('sensor.echo_dot_salon_temperature') | float %}
+          {{ gap >= 4 or (this.state == 'on' and gap >= 3) }}
