@@ -10,7 +10,7 @@ Configuration versionnée d'un Home Assistant domestique (Raspberry Pi 4, Home A
 | `config/packages/mylight_profitability.yaml` | Gain de la batterie virtuelle face à EDF Tarif Bleu, économie de l'installation, dates de retour sur investissement, état de charge de la batterie virtuelle, et puissances de la batterie virtuelle et du réseau facturé, qui partagent la puissance nette mesurée par l'Envoy selon le stock (affichés dans l'onglet Énergie) |
 | `config/packages/notifications.yaml` | Alertes push : sources de données muettes, sauvegarde manquante, redémarrage, sonnette |
 | `config/packages/solar.yaml` | Ensoleillement reçu à la maison, cumulé heure par heure depuis le rayonnement Open-Meteo, comparé à la production dans l'onglet Solaire |
-| `config/dashboards/rentabilite.yaml` | Page Rentabilité, et onglet Solaire : production et ensoleillement par jour et par mois |
+| `config/dashboards/rentabilite.yaml` | Page Rentabilité, et onglet Solaire : production en barres et ensoleillement en courbe, chacun sur son axe, sur 30 jours et sur 12 mois face à l'année précédente |
 | `config/dashboards/maison.yaml` | Page Maison : un onglet par niveau, températures, présence, caméras et aspirateur posés sur le plan |
 | `config/dashboards/musique.yaml` | Page Musique : choix de la pièce, favoris Amazon Music, radio et Audible lancés sur les Echo, lecture en cours et volume par Echo |
 | `config/www/plan-etage.svg`, `config/www/plan-rdc.svg`, `config/www/plan-terrain.svg` | Plans vectoriels des deux niveaux et du terrain, une forme identifiée par pièce, servis sans authentification sous `/local/` |
@@ -29,7 +29,8 @@ Configuration versionnée d'un Home Assistant domestique (Raspberry Pi 4, Home A
 
 1. Copier `config/custom_templates/mylight.example.jinja` en `config/custom_templates/mylight.jinja` et y mettre ses propres valeurs. Le vrai catalogue reste hors git.
 2. Installer l'intégration MyLight Systems par le Marketplace de Home Assistant (Paramètres > Marketplace, dépôt `acesyde/hassio_mylight_integration`, présent au catalogue), puis redémarrer. Elle n'est pas redistribuée ici.
-3. Déclarer un hôte SSH `ha` vers l'add-on Terminal & SSH du Pi.
+3. Installer la carte ApexCharts Card par le Marketplace (dépôt `RomRider/apexcharts-card`), utilisée par l'onglet Solaire.
+4. Déclarer un hôte SSH `ha` vers l'add-on Terminal & SSH du Pi.
 
 ## Déployer
 
@@ -47,7 +48,7 @@ HA_URL=http://192.168.1.250 HA_TOKEN=… node scripts/test-weather-advice.mjs
 
 ## Ce qui n'est pas dans ce dépôt
 
-Les intégrations (Enphase, MyLight, Ring, Google Drive, Tailscale), le contenu installé par le Marketplace (`custom_components/`, `www/community/`), les étages et les pièces, la ressource Lovelace `/local/plan-heatmap.js?v=N` (à incrémenter à chaque modification du fichier), les favoris de l'accueil, le tableau Énergie, les sauvegardes automatiques, les réglages du serveur HTTP et l'unité d'affichage de la production de l'Envoy (kWh au lieu de MWh, pour les graphiques de l'onglet Solaire) sont configurés dans l'interface et stockés dans `.storage/`. Les sauvegardes quotidiennes chiffrées, sur le Pi et sur Google Drive, les couvrent.
+Les intégrations (Enphase, MyLight, Ring, Google Drive, Tailscale), le contenu installé par le Marketplace (`custom_components/`, `www/community/`), les étages et les pièces, la ressource Lovelace `/local/plan-heatmap.js?v=N` (à incrémenter à chaque modification du fichier), les favoris de l'accueil, le tableau Énergie, les sauvegardes automatiques, les réglages du serveur HTTP et l'unité d'affichage de la production de l'Envoy (kWh au lieu de MWh, pour l'onglet Solaire) sont configurés dans l'interface et stockés dans `.storage/`. Les sauvegardes quotidiennes chiffrées, sur le Pi et sur Google Drive, les couvrent.
 
 ## Règles
 

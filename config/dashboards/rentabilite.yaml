@@ -86,51 +86,115 @@ views:
           - type: heading
             heading: 30 derniers jours
             icon: mdi:white-balance-sunny
-          - type: statistics-graph
-            title: Production (kWh)
-            period: day
-            days_to_show: 30
-            stat_types:
-              - change
-            chart_type: bar
-            entities:
+          - type: custom:apexcharts-card
+            section_mode: true
+            graph_span: 30d
+            span:
+              end: day
+            yaxis:
+              - id: production
+                min: 0
+                decimals: 0
+                apex_config:
+                  title:
+                    text: kWh
+              - id: ensoleillement
+                opposite: true
+                min: 0
+                decimals: 1
+                apex_config:
+                  title:
+                    text: kWh/m²
+            series:
               - entity: sensor.envoy_122333060519_production_d_energie_totale
                 name: Production
-          - type: statistics-graph
-            title: Ensoleillement (kWh/m²)
-            period: day
-            days_to_show: 30
-            stat_types:
-              - change
-            chart_type: bar
-            entities:
+                color: "#ff9800"
+                yaxis_id: production
+                type: column
+                statistics:
+                  type: change
+                  period: day
+                  align: start
               - entity: sensor.ensoleillement
                 name: Ensoleillement
+                color: "#1e88e5"
+                extend_to: false
+                yaxis_id: ensoleillement
+                type: line
+                statistics:
+                  type: change
+                  period: day
+                  align: start
       - type: grid
         cards:
           - type: heading
-            heading: Par mois
+            heading: 12 derniers mois, face à l'année précédente
             icon: mdi:calendar-month
-          - type: statistics-graph
-            title: Production (kWh)
-            period: month
-            days_to_show: 600
-            stat_types:
-              - change
-            chart_type: bar
-            entities:
+          - type: custom:apexcharts-card
+            section_mode: true
+            graph_span: 365d
+            span:
+              end: month
+            yaxis:
+              - id: production
+                min: 0
+                decimals: 0
+                apex_config:
+                  title:
+                    text: kWh
+              - id: ensoleillement
+                opposite: true
+                min: 0
+                decimals: 1
+                apex_config:
+                  title:
+                    text: kWh/m²
+            series:
               - entity: sensor.envoy_122333060519_production_d_energie_totale
                 name: Production
-          - type: statistics-graph
-            title: Ensoleillement (kWh/m²)
-            period: month
-            days_to_show: 600
-            stat_types:
-              - change
-            chart_type: bar
-            entities:
+                color: "#ff9800"
+                yaxis_id: production
+                type: column
+                statistics:
+                  type: change
+                  period: month
+                  align: start
+              - entity: sensor.envoy_122333060519_production_d_energie_totale
+                name: Production un an avant
+                color: "#ffcc80"
+                show:
+                  offset_in_name: false
+                yaxis_id: production
+                type: column
+                offset: -365d
+                statistics:
+                  type: change
+                  period: month
+                  align: start
               - entity: sensor.ensoleillement
                 name: Ensoleillement
+                color: "#1e88e5"
+                extend_to: false
+                yaxis_id: ensoleillement
+                type: line
+                statistics:
+                  type: change
+                  period: month
+                  align: start
+              - entity: sensor.ensoleillement
+                name: Ensoleillement un an avant
+                color: "#90caf9"
+                extend_to: false
+                show:
+                  offset_in_name: false
+                yaxis_id: ensoleillement
+                type: line
+                offset: -365d
+                stroke_dash: 4
+                statistics:
+                  type: change
+                  period: month
+                  align: start
       - type: grid
         column_span: 2
         cards:
