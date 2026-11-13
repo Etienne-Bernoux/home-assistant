@@ -47,7 +47,7 @@ HA_URL=http://192.168.1.250 HA_TOKEN=… node scripts/test-weather-advice.mjs
 
 ## Ce qui n'est pas dans ce dépôt
 
-Les intégrations (Enphase, MyLight, Ring, Google Drive, Tailscale), le contenu installé par le Marketplace (`custom_components/`, `www/community/`), les étages et les pièces, la ressource Lovelace `/local/plan-heatmap.js?v=N` (à incrémenter à chaque modification du fichier), les favoris de l'accueil, le tableau Énergie, les sauvegardes automatiques et les réglages du serveur HTTP sont configurés dans l'interface et stockés dans `.storage/`. Les sauvegardes quotidiennes chiffrées, sur le Pi et sur Google Drive, les couvrent.
+Les intégrations (Enphase, MyLight, Ring, Google Drive, Tailscale), le contenu installé par le Marketplace (`custom_components/`, `www/community/`), les étages et les pièces, la ressource Lovelace `/local/plan-heatmap.js?v=N` (à incrémenter à chaque modification du fichier), les favoris de l'accueil, le tableau Énergie, les sauvegardes automatiques, les réglages du serveur HTTP et l'unité d'affichage de la production de l'Envoy (kWh au lieu de MWh, pour les graphiques de l'onglet Solaire) sont configurés dans l'interface et stockés dans `.storage/`. Les sauvegardes quotidiennes chiffrées, sur le Pi et sur Google Drive, les couvrent.
 
 ## Règles
 

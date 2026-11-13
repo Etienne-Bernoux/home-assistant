@@ -87,6 +87,7 @@ views:
             heading: 30 derniers jours
             icon: mdi:white-balance-sunny
           - type: statistics-graph
+            title: Production (kWh)
             period: day
             days_to_show: 30
             stat_types:
@@ -95,6 +96,14 @@ views:
             entities:
               - entity: sensor.envoy_122333060519_production_d_energie_totale
                 name: Production
+          - type: statistics-graph
+            title: Ensoleillement (kWh/m²)
+            period: day
+            days_to_show: 30
+            stat_types:
+              - change
+            chart_type: bar
+            entities:
               - entity: sensor.ensoleillement
                 name: Ensoleillement
       - type: grid
@@ -103,6 +112,7 @@ views:
             heading: Par mois
             icon: mdi:calendar-month
           - type: statistics-graph
+            title: Production (kWh)
             period: month
             days_to_show: 600
             stat_types:
@@ -111,6 +121,14 @@ views:
             entities:
               - entity: sensor.envoy_122333060519_production_d_energie_totale
                 name: Production
+          - type: statistics-graph
+            title: Ensoleillement (kWh/m²)
+            period: month
+            days_to_show: 600
+            stat_types:
+              - change
+            chart_type: bar
+            entities:
               - entity: sensor.ensoleillement
                 name: Ensoleillement
       - type: grid
