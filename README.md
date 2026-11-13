@@ -9,7 +9,8 @@ Configuration versionnée d'un Home Assistant domestique (Raspberry Pi 4, Home A
 | `config/packages/energy_tariff.yaml` | Plages d'heures creuses et prix du kWh en vigueur |
 | `config/packages/mylight_profitability.yaml` | Gain de la batterie virtuelle face à EDF Tarif Bleu, économie de l'installation, dates de retour sur investissement, état de charge de la batterie virtuelle, et puissances de la batterie virtuelle et du réseau facturé, qui partagent la puissance nette mesurée par l'Envoy selon le stock (affichés dans l'onglet Énergie) |
 | `config/packages/notifications.yaml` | Alertes push : sources de données muettes, sauvegarde manquante, redémarrage, sonnette |
-| `config/dashboards/rentabilite.yaml` | Page Rentabilité |
+| `config/packages/solar.yaml` | Ensoleillement reçu à la maison, cumulé heure par heure depuis le rayonnement Open-Meteo, comparé à la production dans l'onglet Solaire |
+| `config/dashboards/rentabilite.yaml` | Page Rentabilité, et onglet Solaire : production et ensoleillement par jour et par mois |
 | `config/dashboards/maison.yaml` | Page Maison : un onglet par niveau, températures, présence, caméras et aspirateur posés sur le plan |
 | `config/dashboards/musique.yaml` | Page Musique : choix de la pièce, favoris Amazon Music, radio et Audible lancés sur les Echo, lecture en cours et volume par Echo |
 | `config/www/plan-etage.svg`, `config/www/plan-rdc.svg`, `config/www/plan-terrain.svg` | Plans vectoriels des deux niveaux et du terrain, une forme identifiée par pièce, servis sans authentification sous `/local/` |
@@ -21,6 +22,7 @@ Configuration versionnée d'un Home Assistant domestique (Raspberry Pi 4, Home A
 | `config/custom_templates/mylight.example.jinja` | Catalogue daté des tarifs, forfaits, volumes de référence et investissements, avec des valeurs fictives |
 | `scripts/deploy.sh` | Déploiement sur le Pi avec retour arrière |
 | `scripts/import-battery-history.mjs` | Import de l'historique horaire officiel du stock de la batterie virtuelle depuis l'API MyLight (`HA_URL`, `HA_TOKEN`, identifiants MyLight dans le trousseau macOS, entrée `mylight`) |
+| `scripts/import-radiation-history.mjs` | Import de l'historique horaire d'ensoleillement Open-Meteo depuis mars 2025, à lancer une seule fois, au moins 5 minutes après le premier démarrage du capteur, pour que la série se raccorde au cumul en cours (`HA_URL`, `HA_TOKEN`) |
 | `scripts/test-weather-advice.mjs` | Tests de `weather_advice.jinja` sur le Pi avec des prévisions fabriquées (`HA_URL`, `HA_TOKEN`) |
 
 ## Installer

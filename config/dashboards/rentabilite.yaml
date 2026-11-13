@@ -75,3 +75,53 @@ views:
               coût MyLight comparé à toute la consommation au Tarif Bleu. Abonnement réseau exclu
               des deux côtés. Prix MyLight supposé égal au Tarif Bleu jusqu'au 31 octobre 2026.
               Remboursements : coût du matériel MyLight et de l'installation complète (catalogue `investments`), au gain et à l'économie annuels attendus aux tarifs et forfait en vigueur sur les volumes de l'année de référence. Historique antérieur à la mise en service calculé au pas journalier (75 % heures pleines).
+  - title: Solaire
+    path: solaire
+    icon: mdi:solar-power-variant
+    type: sections
+    max_columns: 2
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: 30 derniers jours
+            icon: mdi:white-balance-sunny
+          - type: statistics-graph
+            period: day
+            days_to_show: 30
+            stat_types:
+              - change
+            chart_type: bar
+            entities:
+              - entity: sensor.envoy_122333060519_production_d_energie_totale
+                name: Production
+              - entity: sensor.ensoleillement
+                name: Ensoleillement
+      - type: grid
+        cards:
+          - type: heading
+            heading: Par mois
+            icon: mdi:calendar-month
+          - type: statistics-graph
+            period: month
+            days_to_show: 600
+            stat_types:
+              - change
+            chart_type: bar
+            entities:
+              - entity: sensor.envoy_122333060519_production_d_energie_totale
+                name: Production
+              - entity: sensor.ensoleillement
+                name: Ensoleillement
+      - type: grid
+        column_span: 2
+        cards:
+          - type: markdown
+            content: >
+              **Lecture.** Ensoleillement : rayonnement solaire reçu au sol sur une surface à plat,
+              d'après le modèle météo Open-Meteo à la position de la maison, heure par heure.
+              Les panneaux étant inclinés, chaque kWh/m² rapporte plus quand le soleil est bas :
+              environ 5,5 kWh produits l'été, 9 l'hiver par jour clair, deux fois moins par jour de
+              brouillard. Comparer un mois au même mois de l'année précédente : si la production
+              baisse alors que l'ensoleillement tient, les panneaux sont sales ou un micro-onduleur
+              est en panne.

@@ -1,0 +1,45 @@
+rest_command:
+  open_meteo_radiation:
+    url: >-
+      https://api.open-meteo.com/v1/forecast?latitude={{ state_attr('zone.home', 'latitude') | round(2) }}&longitude={{ state_attr('zone.home', 'longitude') | round(2) }}&hourly=shortwave_radiation&past_days=2&forecast_days=1&timezone=GMT
+    method: get
+    timeout: 30
+
+template:
+  - triggers:
+      - trigger: homeassistant
+        event: start
+      - trigger: time_pattern
+        minutes: 5
+    actions:
+      - action: rest_command.open_meteo_radiation
+        response_variable: meteo
+        continue_on_error: true
+    sensor:
+      - name: Ensoleillement
+        unique_id: ensoleillement
+        icon: mdi:white-balance-sunny
+        unit_of_measurement: kWh/m²
+        state_class: total_increasing
+        state: >
+          {% set hour = utcnow().strftime('%Y-%m-%dT%H:00') %}
+          {% set through = this.attributes.get('through') %}
+          {% set ns = namespace(total=this.state | float(0)) %}
+          {% if through is not none and meteo is defined and meteo.status == 200 %}
+            {% set hourly = meteo.content.hourly %}
+            {% for time in hourly.time %}
+              {% set value = hourly.shortwave_radiation[loop.index0] %}
+              {% if through < time <= hour and value is number %}
+                {% set ns.total = ns.total + value / 1000 %}
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+          {{ ns.total | round(4) }}
+        attributes:
+          through: >
+            {% set through = this.attributes.get('through') %}
+            {% if through is none or (meteo is defined and meteo.status == 200) %}
+              {{ utcnow().strftime('%Y-%m-%dT%H:00') }}
+            {% else %}
+              {{ through }}
+            {% endif %}
