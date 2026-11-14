@@ -82,6 +82,31 @@ automation:
           title: Home Assistant a redémarré
           message: "Démarrage à {{ now().strftime('%H:%M') }}."
 
+  - id: yoto_charge_reminder
+    alias: Rappeler de recharger les Yoto avant la nuit
+    mode: single
+    triggers:
+      - trigger: time
+        at: "19:30:00"
+    variables:
+      low: >
+        {% set ns = namespace(names=[]) %}
+        {% for name, slug in [('Aimée', 'aimee'), ('Ambroise', 'ambroise')] %}
+          {% set level = states('sensor.yoto_' ~ slug ~ '_batterie') | float(100) %}
+          {% if level < 20 and is_state('binary_sensor.yoto_' ~ slug ~ '_en_charge', 'off') %}
+            {% set ns.names = ns.names + [name ~ ' (' ~ level | int ~ ' %)'] %}
+          {% endif %}
+        {% endfor %}
+        {{ ns.names }}
+    conditions:
+      - condition: template
+        value_template: "{{ low | count > 0 }}"
+    actions:
+      - action: notify.mobile_app_pixel_6
+        data:
+          title: Yoto à recharger
+          message: "{{ low | join(' et ') }} : batterie faible et pas en charge."
+
   - id: doorbell_announce
     alias: Prévenir le téléphone quand on sonne
     mode: single

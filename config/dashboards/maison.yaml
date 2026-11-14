@@ -209,6 +209,18 @@ views:
                   top: 81.5%
                   left: 74.2%
               - type: state-icon
+                entity: media_player.yoto_aimee
+                icon: mdi:music-box
+                style:
+                  top: 44.2%
+                  left: 70%
+              - type: state-icon
+                entity: media_player.yoto_ambroise
+                icon: mdi:music-box
+                style:
+                  top: 44.2%
+                  left: 77.2%
+              - type: state-icon
                 entity: media_player.4eme_echo_dot_etienne
                 style:
                   top: 14.8%
