@@ -272,6 +272,31 @@ views:
                   top: 43.9%
                   left: 35.3%
               - type: state-icon
+                entity: switch.mylight_systems_relais_principal
+                icon: mdi:electric-switch
+                title: Relais du chauffe-eau
+                style:
+                  top: 71.3%
+                  left: 85.2%
+              - type: state-icon
+                entity: binary_sensor.chauffe_eau_en_chauffe
+                icon: mdi:water-boiler
+                style:
+                  top: 71.3%
+                  left: 90.3%
+              - type: state-label
+                entity: sensor.garage_central_mylight_systems_puissance_chauffe_eau_instantanee
+                style:
+                  top: 73.4%
+                  left: 70.2%
+              - type: state-icon
+                entity: binary_sensor.raspberry_pi_power_status
+                icon: mdi:raspberry-pi
+                title: Raspberry Pi
+                style:
+                  top: 50.3%
+                  left: 33.7%
+              - type: state-icon
                 entity: camera.garage_central_vue_en_direct
                 icon: mdi:cctv
                 style:

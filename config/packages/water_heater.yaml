@@ -1,0 +1,8 @@
+template:
+  - binary_sensor:
+      - name: Chauffe-eau en chauffe
+        unique_id: water_heater_heating
+        device_class: heat
+        icon: mdi:water-boiler
+        availability: "{{ states('sensor.garage_central_mylight_systems_puissance_chauffe_eau_instantanee') | is_number }}"
+        state: "{{ states('sensor.garage_central_mylight_systems_puissance_chauffe_eau_instantanee') | float > 100 }}"
