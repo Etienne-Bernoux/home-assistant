@@ -87,14 +87,14 @@ automation:
     mode: single
     triggers:
       - trigger: time
-        at: "19:30:00"
+        at: "18:30:00"
     variables:
       low: >
         {% set ns = namespace(names=[]) %}
         {% for name, slug in [('Aimée', 'aimee'), ('Ambroise', 'ambroise')] %}
           {% set level = states('sensor.yoto_' ~ slug ~ '_batterie') | float(100) %}
           {% if level < 20 and is_state('binary_sensor.yoto_' ~ slug ~ '_en_charge', 'off') %}
-            {% set ns.names = ns.names + [name ~ ' (' ~ level | int ~ ' %)'] %}
+            {% set ns.names = ns.names + ["le Yoto d'" ~ name ~ ", à " ~ level | int ~ " pour cent"] %}
           {% endif %}
         {% endfor %}
         {{ ns.names }}
@@ -102,10 +102,11 @@ automation:
       - condition: template
         value_template: "{{ low | count > 0 }}"
     actions:
-      - action: notify.mobile_app_pixel_6
+      - action: notify.send_message
+        target:
+          entity_id: notify.partout_annoncer
         data:
-          title: Yoto à recharger
-          message: "{{ low | join(' et ') }} : batterie faible et pas en charge."
+          message: "Pensez à mettre en charge {{ low | join(', et ') }}."
 
   - id: doorbell_announce
     alias: Prévenir le téléphone quand on sonne
