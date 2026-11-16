@@ -235,6 +235,18 @@ views:
                 style:
                   top: 14.8%
                   left: 71.5%
+              - type: state-icon
+                entity: switch.garage_central_shellyemg4_84c7bb233c88
+                icon: mdi:electric-switch
+                title: Alimentation de l'annexe
+                style:
+                  top: 24.3%
+                  left: 77.8%
+              - type: state-label
+                entity: sensor.garage_central_shellyemg4_84c7bb233c88_energy_meter_0_puissance
+                style:
+                  top: 30.2%
+                  left: 77.8%
   - title: Rez-de-chaussée
     path: rez-de-chaussee
     icon: mdi:home-floor-0
