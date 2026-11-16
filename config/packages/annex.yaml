@@ -71,6 +71,39 @@ automation:
                 {{ states('input_number.annexe_puissance_coupure') | int }} W, après {{ waits | count }} remises
                 automatiques. Réduisez la charge puis rallumez l'annexe depuis le plan de l'étage.
 
+  - id: annex_power_lost
+    alias: Alerter si l'annexe est coupée hors coupure automatique
+    mode: single
+    triggers:
+      - trigger: state
+        entity_id: switch.garage_central_shellyemg4_84c7bb233c88
+        to: "off"
+        id: switched_off
+      - trigger: numeric_state
+        entity_id: sensor.garage_central_shellyemg4_84c7bb233c88_energy_meter_0_puissance
+        below: 5
+        for: "00:02:00"
+        id: no_power
+    conditions:
+      - condition: template
+        value_template: >
+          {% if trigger.id == 'switched_off' %}
+            {{ trigger.to_state.context.parent_id is none }}
+          {% else %}
+            {{ is_state('switch.garage_central_shellyemg4_84c7bb233c88', 'on') }}
+          {% endif %}
+    actions:
+      - action: notify.mobile_app_pixel_6
+        data:
+          title: Annexe coupée
+          message: >
+            {% if trigger.id == 'switched_off' %}
+              L'alimentation de l'annexe a été coupée à la main.
+            {% else %}
+              L'annexe ne consomme plus rien depuis 2 minutes alors que son alimentation est allumée :
+              disjoncteur déclenché ou contacteur ouvert.
+            {% endif %}
+
   - id: annex_overload_cut_reset
     alias: Remettre à zéro les coupures de l'annexe après 30 minutes sans coupure
     mode: restart
