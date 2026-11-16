@@ -28,7 +28,7 @@ template:
             false
           {% else %}
             {% set closed = this.attributes.get('last_closed') %}
-            {% set start = today_at('02:00') if trigger.id == 'night' else today_at('07:00') %}
+            {% set start = today_at('00:00') if trigger.id == 'night' else today_at('07:00') %}
             {{ not is_state('switch.mylight_systems_relais_principal', 'on')
                and (closed is none or as_datetime(closed) < start) }}
           {% endif %}
@@ -37,3 +37,35 @@ template:
             {{ now().isoformat() if trigger.id == 'closed' else this.attributes.get('last_closed') }}
           window: >
             {{ trigger.id if trigger.id in ['night', 'midday'] else this.attributes.get('window') }}
+
+  - triggers:
+      - trigger: state
+        entity_id: switch.mylight_systems_relais_principal
+        from: "on"
+        to: "off"
+    binary_sensor:
+      - name: Chauffe-eau pas plein
+        unique_id: water_heater_not_full
+        icon: mdi:water-boiler-off
+        state: "{{ is_state('binary_sensor.chauffe_eau_en_chauffe', 'on') }}"
+
+automation:
+  - id: water_heater_preheat
+    alias: Avancer d'une heure la chauffe si le ballon n'a pas fini la précédente
+    mode: single
+    triggers:
+      - trigger: time
+        at: "01:00:00"
+      - trigger: time
+        at: "11:30:00"
+    conditions:
+      - condition: state
+        entity_id: binary_sensor.chauffe_eau_pas_plein
+        state: "on"
+      - condition: state
+        entity_id: switch.mylight_systems_relais_principal
+        state: "off"
+    actions:
+      - action: switch.turn_on
+        target:
+          entity_id: switch.mylight_systems_relais_principal
