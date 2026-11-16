@@ -283,6 +283,11 @@ views:
                 style:
                   top: 43.9%
                   left: 35.3%
+              - type: state-label
+                entity: sensor.shellyplugmg3_083af2da497c_puissance
+                style:
+                  top: 34.4%
+                  left: 35.3%
               - type: state-icon
                 entity: switch.mylight_systems_relais_principal
                 icon: mdi:electric-switch
