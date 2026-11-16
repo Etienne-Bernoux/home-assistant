@@ -7,6 +7,82 @@ input_number:
     max: 20
     step: 0.5
     mode: box
+  annexe_puissance_coupure:
+    name: Puissance de coupure de l'annexe
+    icon: mdi:flash-off
+    unit_of_measurement: W
+    min: 2000
+    max: 4600
+    step: 100
+    mode: box
+
+counter:
+  annexe_coupures:
+    name: Coupures successives de l'annexe
+    icon: mdi:counter
+
+automation:
+  - id: annex_overload_cut
+    alias: Couper l'annexe au-delà de sa puissance de coupure
+    mode: single
+    triggers:
+      - trigger: numeric_state
+        entity_id: sensor.garage_central_shellyemg4_84c7bb233c88_energy_meter_0_puissance
+        above: input_number.annexe_puissance_coupure
+        for: "00:00:30"
+    conditions:
+      - condition: state
+        entity_id: switch.garage_central_shellyemg4_84c7bb233c88
+        state: "on"
+    actions:
+      - variables:
+          power: "{{ states('sensor.garage_central_shellyemg4_84c7bb233c88_energy_meter_0_puissance') | float | round(0) | int }}"
+      - action: switch.turn_off
+        target:
+          entity_id: switch.garage_central_shellyemg4_84c7bb233c88
+      - action: counter.increment
+        target:
+          entity_id: counter.annexe_coupures
+      - variables:
+          attempt: "{{ states('counter.annexe_coupures') | int }}"
+          waits: [1, 1, 3, 5, 10]
+      - if:
+          - condition: template
+            value_template: "{{ attempt <= waits | count }}"
+        then:
+          - action: notify.mobile_app_pixel_6
+            data:
+              title: Annexe coupée
+              message: >
+                {{ power }} W pendant 30 secondes, au-dessus de la coupure à
+                {{ states('input_number.annexe_puissance_coupure') | int }} W. Remise automatique dans
+                {{ waits[attempt - 1] }} min (essai {{ attempt }} sur {{ waits | count }}).
+          - delay:
+              minutes: "{{ waits[attempt - 1] }}"
+          - action: switch.turn_on
+            target:
+              entity_id: switch.garage_central_shellyemg4_84c7bb233c88
+        else:
+          - action: notify.mobile_app_pixel_6
+            data:
+              title: Annexe coupée, remise manuelle
+              message: >
+                {{ power }} W pendant 30 secondes, au-dessus de la coupure à
+                {{ states('input_number.annexe_puissance_coupure') | int }} W, après {{ waits | count }} remises
+                automatiques. Réduisez la charge puis rallumez l'annexe depuis le plan de l'étage.
+
+  - id: annex_overload_cut_reset
+    alias: Remettre à zéro les coupures de l'annexe après 30 minutes sans coupure
+    mode: restart
+    triggers:
+      - trigger: state
+        entity_id: switch.garage_central_shellyemg4_84c7bb233c88
+        to: "on"
+        for: "00:30:00"
+    actions:
+      - action: counter.reset
+        target:
+          entity_id: counter.annexe_coupures
 
 template:
   - sensor:
