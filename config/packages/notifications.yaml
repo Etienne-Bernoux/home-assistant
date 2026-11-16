@@ -98,6 +98,31 @@ automation:
             L'annexe tire {{ states('sensor.shellyemg4_84c7bb233c88_energy_meter_0_courant') | float | round(1) }} A
             depuis 15 minutes, sur une ligne de 20 A. Évitez d'y lancer en plus le four ou une machine.
 
+  - id: cellar_plug_off
+    alias: Alerter si la prise du congélateur est coupée
+    mode: single
+    triggers:
+      - trigger: state
+        entity_id: switch.shellyplugmg3_083af2d920c0
+        to: "off"
+        for: "00:01:00"
+        id: switched_off
+      - trigger: state
+        entity_id: switch.shellyplugmg3_083af2d920c0
+        to: unavailable
+        for: "00:10:00"
+        id: unreachable
+    actions:
+      - action: notify.mobile_app_pixel_6
+        data:
+          title: Congélateur du cellier
+          message: >
+            {% if trigger.id == 'switched_off' %}
+              La prise du congélateur et du petit frigo est coupée. Rallumez-la depuis Home Assistant.
+            {% else %}
+              La prise du congélateur et du petit frigo ne répond plus depuis 10 minutes : coupure de courant ou disjoncteur.
+            {% endif %}
+
   - id: yoto_charge_reminder
     alias: Rappeler de recharger les Yoto avant la nuit
     mode: single
