@@ -24,6 +24,14 @@ views:
           - type: tile
             entity: sensor.prix_heures_pleines
             name: Prix appliqué, heures pleines
+          - type: tile
+            entity: input_number.annexe_seuil_courant
+            name: Alerte au-delà de, pendant 15 min
+            grid_options:
+              columns: full
+            features:
+              - type: numeric-input
+                style: buttons
           - type: history-graph
             title: Dernières 48 heures
             hours_to_show: 48
@@ -107,5 +115,5 @@ views:
               **Calcul.** Chaque kWh mesuré par le Shelly EM sur la ligne de l'annexe est compté au
               prix heures pleines en vigueur ce jour-là, même la nuit et même quand le solaire couvre
               la maison, comme si l'annexe avait son propre compteur au tarif le plus cher. Mesure
-              depuis le 16 novembre 2026. Une alerte part sur le téléphone si la ligne dépasse 18 A
-              pendant 15 minutes.
+              depuis le 16 novembre 2026. Une alerte part sur le téléphone si la ligne dépasse le
+              seuil réglé ci-dessus pendant 15 minutes (18 A conseillé sur cette ligne de 20 A).

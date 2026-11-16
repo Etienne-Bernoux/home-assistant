@@ -88,7 +88,7 @@ automation:
     triggers:
       - trigger: numeric_state
         entity_id: sensor.shellyemg4_84c7bb233c88_energy_meter_0_courant
-        above: 18
+        above: input_number.annexe_seuil_courant
         for: "00:15:00"
     actions:
       - action: notify.mobile_app_pixel_6
@@ -96,7 +96,8 @@ automation:
           title: Annexe proche de la limite
           message: >
             L'annexe tire {{ states('sensor.shellyemg4_84c7bb233c88_energy_meter_0_courant') | float | round(1) }} A
-            depuis 15 minutes, sur une ligne de 20 A. Évitez d'y lancer en plus le four ou une machine.
+            depuis 15 minutes, au-dessus du seuil de {{ states('input_number.annexe_seuil_courant') | float }} A,
+            sur une ligne de 20 A. Évitez d'y lancer en plus le four ou une machine.
 
   - id: cellar_plug_off
     alias: Alerter si la prise du congélateur est coupée
