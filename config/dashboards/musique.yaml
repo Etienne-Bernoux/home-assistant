@@ -162,3 +162,105 @@ views:
             features:
               - type: media-player-playback
               - type: media-player-volume-slider
+  - title: Yoto
+    path: yoto
+    icon: mdi:account-child
+    type: sections
+    max_columns: 2
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Aimée
+            icon: mdi:account-child
+          - type: tile
+            entity: media_player.yoto_aimee
+            name: Lecture
+            state_content:
+              - state
+              - media_album_name
+              - media_title
+            grid_options:
+              columns: full
+            features:
+              - type: media-player-playback
+              - type: media-player-volume-slider
+          - type: tile
+            entity: sensor.yoto_aimee_batterie
+            name: Batterie
+          - type: tile
+            entity: binary_sensor.yoto_aimee_en_charge
+            name: Charge
+          - type: tile
+            entity: sensor.yoto_aimee_mode_jour
+            name: Mode
+          - type: tile
+            entity: binary_sensor.yoto_aimee_casque_audio
+            name: Casque
+          - type: entities
+            title: Réglages
+            grid_options:
+              columns: full
+            entities:
+              - entity: time.yoto_aimee_debut_mode_jour
+                name: Début du jour
+              - entity: time.yoto_aimee_debut_mode_nuit
+                name: Début de la nuit
+              - entity: number.yoto_aimee_volume_max_mode_jour
+                name: Volume max le jour
+              - entity: number.yoto_aimee_volume_max_mode_nuit
+                name: Volume max la nuit
+              - entity: number.yoto_aimee_luminosite_mode_jour
+                name: Luminosité le jour
+              - entity: number.yoto_aimee_luminosite_mode_nuit
+                name: Luminosité la nuit
+              - entity: switch.yoto_aimee_volume_max_du_casque
+                name: Limiter le volume du casque
+      - type: grid
+        cards:
+          - type: heading
+            heading: Ambroise
+            icon: mdi:account-child
+          - type: tile
+            entity: media_player.yoto_ambroise
+            name: Lecture
+            state_content:
+              - state
+              - media_album_name
+              - media_title
+            grid_options:
+              columns: full
+            features:
+              - type: media-player-playback
+              - type: media-player-volume-slider
+          - type: tile
+            entity: sensor.yoto_ambroise_batterie
+            name: Batterie
+          - type: tile
+            entity: binary_sensor.yoto_ambroise_en_charge
+            name: Charge
+          - type: tile
+            entity: sensor.yoto_ambroise_mode_jour
+            name: Mode
+          - type: tile
+            entity: binary_sensor.yoto_ambroise_casque_audio
+            name: Casque
+          - type: entities
+            title: Réglages
+            grid_options:
+              columns: full
+            entities:
+              - entity: time.yoto_ambroise_debut_mode_jour
+                name: Début du jour
+              - entity: time.yoto_ambroise_debut_mode_nuit
+                name: Début de la nuit
+              - entity: number.yoto_ambroise_volume_max_mode_jour
+                name: Volume max le jour
+              - entity: number.yoto_ambroise_volume_max_mode_nuit
+                name: Volume max la nuit
+              - entity: number.yoto_ambroise_luminosite_mode_jour
+                name: Luminosité le jour
+              - entity: number.yoto_ambroise_luminosite_mode_nuit
+                name: Luminosité la nuit
+              - entity: switch.yoto_ambroise_volume_max_du_casque
+                name: Limiter le volume du casque
