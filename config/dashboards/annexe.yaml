@@ -1,0 +1,111 @@
+title: Annexe
+views:
+  - title: Annexe
+    path: annexe
+    icon: mdi:home-floor-a
+    type: sections
+    max_columns: 2
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Maintenant
+            icon: mdi:flash
+          - type: tile
+            entity: sensor.garage_central_shellyemg4_84c7bb233c88_energy_meter_0_puissance
+            name: Puissance
+          - type: tile
+            entity: sensor.shellyemg4_84c7bb233c88_energy_meter_0_courant
+            name: Courant, ligne de 20 A
+          - type: tile
+            entity: switch.garage_central_shellyemg4_84c7bb233c88
+            name: Alimentation de l'annexe
+            icon: mdi:electric-switch
+          - type: tile
+            entity: sensor.prix_heures_pleines
+            name: Prix appliqué, heures pleines
+          - type: history-graph
+            title: Dernières 48 heures
+            hours_to_show: 48
+            entities:
+              - entity: sensor.garage_central_shellyemg4_84c7bb233c88_energy_meter_0_puissance
+                name: Puissance
+      - type: grid
+        cards:
+          - type: heading
+            heading: Consommation et coût
+            icon: mdi:cash
+          - type: statistic
+            entity: sensor.shellyemg4_84c7bb233c88_energy_meter_0_energie
+            name: Aujourd'hui
+            stat_type: change
+            period:
+              calendar:
+                period: day
+          - type: statistic
+            entity: sensor.cout_annexe
+            name: Aujourd'hui
+            stat_type: change
+            period:
+              calendar:
+                period: day
+          - type: statistic
+            entity: sensor.shellyemg4_84c7bb233c88_energy_meter_0_energie
+            name: Ce mois-ci
+            stat_type: change
+            period:
+              calendar:
+                period: month
+          - type: statistic
+            entity: sensor.cout_annexe
+            name: Ce mois-ci
+            stat_type: change
+            period:
+              calendar:
+                period: month
+          - type: statistic
+            entity: sensor.shellyemg4_84c7bb233c88_energy_meter_0_energie
+            name: Mois dernier
+            stat_type: change
+            period:
+              calendar:
+                period: month
+                offset: -1
+          - type: statistic
+            entity: sensor.cout_annexe
+            name: Mois dernier
+            stat_type: change
+            period:
+              calendar:
+                period: month
+                offset: -1
+          - type: statistics-graph
+            title: Consommation par jour
+            entities:
+              - entity: sensor.shellyemg4_84c7bb233c88_energy_meter_0_energie
+                name: Annexe
+            stat_types:
+              - change
+            period: day
+            chart_type: bar
+            days_to_show: 30
+          - type: statistics-graph
+            title: Coût par mois
+            entities:
+              - entity: sensor.cout_annexe
+                name: Annexe
+            stat_types:
+              - change
+            period: month
+            chart_type: bar
+            days_to_show: 365
+      - type: grid
+        column_span: 2
+        cards:
+          - type: markdown
+            content: >
+              **Calcul.** Chaque kWh mesuré par le Shelly EM sur la ligne de l'annexe est compté au
+              prix heures pleines en vigueur ce jour-là, même la nuit et même quand le solaire couvre
+              la maison, comme si l'annexe avait son propre compteur au tarif le plus cher. Mesure
+              depuis le 16 novembre 2026. Une alerte part sur le téléphone si la ligne dépasse 18 A
+              pendant 15 minutes.

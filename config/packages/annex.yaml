@@ -1,0 +1,37 @@
+template:
+  - sensor:
+      - name: Prix heures pleines
+        unique_id: electricity_peak_price
+        icon: mdi:currency-eur
+        unit_of_measurement: EUR/kWh
+        state: >
+          {% from 'mylight.jinja' import ml_tariffs %}
+          {{ (ml_tariffs() | from_json | selectattr('from', '<=', now().date() | string) | list | last).peak }}
+
+  - triggers:
+      - trigger: state
+        entity_id: sensor.shellyemg4_84c7bb233c88_energy_meter_0_energie
+    sensor:
+      - name: Coût annexe
+        unique_id: annex_cost
+        icon: mdi:cash
+        unit_of_measurement: EUR
+        device_class: monetary
+        state_class: total
+        state: >
+          {% from 'mylight.jinja' import ml_tariffs %}
+          {% set peak = (ml_tariffs() | from_json | selectattr('from', '<=', now().date() | string) | list | last).peak %}
+          {% set energy = states('sensor.shellyemg4_84c7bb233c88_energy_meter_0_energie') %}
+          {% set last = this.attributes.get('last_kwh') %}
+          {% set total = this.state | float(0) %}
+          {% if energy | is_number %}
+            {% set delta = energy | float - (last | float(0)) %}
+            {% if delta > 0 %}
+              {% set total = total + delta * peak %}
+            {% endif %}
+          {% endif %}
+          {{ total | round(4) }}
+        attributes:
+          last_kwh: >
+            {% set energy = states('sensor.shellyemg4_84c7bb233c88_energy_meter_0_energie') %}
+            {{ energy | float if energy | is_number else this.attributes.get('last_kwh') }}
