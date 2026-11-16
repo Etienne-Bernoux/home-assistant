@@ -6,3 +6,34 @@ template:
         icon: mdi:water-boiler
         availability: "{{ states('sensor.garage_central_mylight_systems_puissance_chauffe_eau_instantanee') | is_number }}"
         state: "{{ states('sensor.garage_central_mylight_systems_puissance_chauffe_eau_instantanee') | float > 100 }}"
+
+  - triggers:
+      - trigger: state
+        entity_id: switch.mylight_systems_relais_principal
+        to: "on"
+        id: closed
+      - trigger: time
+        at: "07:30:00"
+        id: night
+      - trigger: time
+        at: "15:45:00"
+        id: midday
+    binary_sensor:
+      - name: Chauffe-eau pas chauffé
+        unique_id: water_heater_missed_heating
+        device_class: problem
+        icon: mdi:water-boiler-alert
+        state: >
+          {% if trigger.id == 'closed' %}
+            false
+          {% else %}
+            {% set closed = this.attributes.get('last_closed') %}
+            {% set start = today_at('02:00') if trigger.id == 'night' else today_at('07:00') %}
+            {{ not is_state('switch.mylight_systems_relais_principal', 'on')
+               and (closed is none or as_datetime(closed) < start) }}
+          {% endif %}
+        attributes:
+          last_closed: >
+            {{ now().isoformat() if trigger.id == 'closed' else this.attributes.get('last_closed') }}
+          window: >
+            {{ trigger.id if trigger.id in ['night', 'midday'] else this.attributes.get('window') }}

@@ -300,12 +300,27 @@ views:
                 style:
                   top: 71.3%
                   left: 85.2%
-              - type: state-icon
-                entity: binary_sensor.chauffe_eau_en_chauffe
-                icon: mdi:water-boiler
-                style:
-                  top: 71.3%
-                  left: 90.3%
+              - type: conditional
+                conditions:
+                  - entity: binary_sensor.chauffe_eau_pas_chauffe
+                    state_not: "on"
+                elements:
+                  - type: state-icon
+                    entity: binary_sensor.chauffe_eau_en_chauffe
+                    icon: mdi:water-boiler
+                    style:
+                      top: 71.3%
+                      left: 90.3%
+              - type: conditional
+                conditions:
+                  - entity: binary_sensor.chauffe_eau_pas_chauffe
+                    state: "on"
+                elements:
+                  - type: state-icon
+                    entity: binary_sensor.chauffe_eau_pas_chauffe
+                    style:
+                      top: 71.3%
+                      left: 90.3%
               - type: state-label
                 entity: sensor.garage_central_mylight_systems_puissance_chauffe_eau_instantanee
                 style:

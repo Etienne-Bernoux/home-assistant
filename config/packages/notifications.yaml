@@ -124,6 +124,26 @@ automation:
               La prise du congélateur et du petit frigo ne répond plus depuis 10 minutes : coupure de courant ou disjoncteur.
             {% endif %}
 
+  - id: water_heater_missed_heating
+    alias: Alerter si le chauffe-eau n'a pas chauffé pendant les heures creuses
+    mode: single
+    triggers:
+      - trigger: state
+        entity_id: binary_sensor.chauffe_eau_pas_chauffe
+        not_from: unavailable
+        to: "on"
+    actions:
+      - action: notify.mobile_app_pixel_6
+        data:
+          title: Chauffe-eau
+          message: >
+            {% if state_attr('binary_sensor.chauffe_eau_pas_chauffe', 'window') == 'night' %}
+              Le relais MyLight ne s'est pas fermé cette nuit entre 2 h et 7 h : l'eau n'a pas chauffé.
+            {% else %}
+              Le relais MyLight ne s'est pas fermé depuis 7 h, heures creuses de midi comprises : l'eau n'a pas chauffé.
+            {% endif %}
+            Vérifiez le mode du relais dans l'application MyLight.
+
   - id: yoto_charge_reminder
     alias: Rappeler de recharger les Yoto avant la nuit
     mode: single
