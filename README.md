@@ -8,7 +8,7 @@ Configuration versionnée d'un Home Assistant domestique (Raspberry Pi 4, Home A
 |---|---|
 | `config/packages/energy_tariff.yaml` | Plages d'heures creuses et prix du kWh en vigueur |
 | `config/packages/mylight_profitability.yaml` | Gain de la batterie virtuelle face à EDF Tarif Bleu, économie de l'installation, dates de retour sur investissement, état de charge de la batterie virtuelle, et puissances de la batterie virtuelle et du réseau facturé, qui partagent la puissance nette mesurée par l'Envoy selon le stock (affichés dans l'onglet Énergie) |
-| `config/packages/notifications.yaml` | Alertes push : sources de données muettes, sauvegarde manquante, redémarrage, sonnette, et annonce sur les Echo à 18 h 30 des Yoto des enfants sous 20 % et pas en charge |
+| `config/packages/notifications.yaml` | Alertes push : sources de données muettes, sauvegarde manquante, redémarrage, sonnette, annexe au-dessus de 18 A pendant 15 minutes sur sa ligne de 20 A, et annonce sur les Echo à 18 h 30 des Yoto des enfants sous 20 % et pas en charge |
 | `config/packages/solar.yaml` | Ensoleillement reçu à la maison, cumulé heure par heure depuis le rayonnement Open-Meteo, comparé à la production dans l'onglet Solaire |
 | `config/packages/water_heater.yaml` | Chauffe-eau en chauffe au-dessus de 100 W, d'après la puissance mesurée par MyLight, pour colorer son icône sur le plan du rez-de-chaussée |
 | `config/dashboards/rentabilite.yaml` | Page Rentabilité, et onglet Solaire : production en barres et ensoleillement en courbe, chacun sur son axe, sur 30 jours et sur 12 mois face à l'année précédente |

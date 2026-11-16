@@ -82,6 +82,22 @@ automation:
           title: Home Assistant a redémarré
           message: "Démarrage à {{ now().strftime('%H:%M') }}."
 
+  - id: annex_line_overload
+    alias: Alerter si l'annexe tire près de la limite de sa ligne
+    mode: single
+    triggers:
+      - trigger: numeric_state
+        entity_id: sensor.shellyemg4_84c7bb233c88_energy_meter_0_courant
+        above: 18
+        for: "00:15:00"
+    actions:
+      - action: notify.mobile_app_pixel_6
+        data:
+          title: Annexe proche de la limite
+          message: >
+            L'annexe tire {{ states('sensor.shellyemg4_84c7bb233c88_energy_meter_0_courant') | float | round(1) }} A
+            depuis 15 minutes, sur une ligne de 20 A. Évitez d'y lancer en plus le four ou une machine.
+
   - id: yoto_charge_reminder
     alias: Rappeler de recharger les Yoto avant la nuit
     mode: single
