@@ -236,14 +236,14 @@ views:
                   top: 14.8%
                   left: 71.5%
               - type: state-icon
-                entity: switch.garage_central_shellyemg4_84c7bb233c88
+                entity: switch.annexe_alimentation
                 icon: mdi:electric-switch
                 title: Alimentation de l'annexe
                 style:
                   top: 24.3%
                   left: 77.8%
               - type: state-label
-                entity: sensor.garage_central_shellyemg4_84c7bb233c88_energy_meter_0_puissance
+                entity: sensor.annexe_puissance
                 style:
                   top: 30.2%
                   left: 77.8%
@@ -284,17 +284,17 @@ views:
                   top: 43.9%
                   left: 35.3%
               - type: state-label
-                entity: sensor.shellyplugmg3_083af2da497c_puissance
+                entity: sensor.prise_bureau_puissance
                 style:
                   top: 34.4%
                   left: 35.3%
               - type: state-label
-                entity: sensor.shellyplugmg3_083af2d920c0_puissance
+                entity: sensor.prise_cellier_puissance
                 style:
                   top: 42.5%
                   left: 65.3%
               - type: state-icon
-                entity: switch.mylight_systems_relais_principal
+                entity: switch.chauffe_eau_relais
                 icon: mdi:electric-switch
                 title: Relais du chauffe-eau
                 style:
@@ -322,7 +322,7 @@ views:
                       top: 71.3%
                       left: 90.3%
               - type: state-label
-                entity: sensor.garage_central_mylight_systems_puissance_chauffe_eau_instantanee
+                entity: sensor.chauffe_eau_puissance
                 style:
                   top: 73.4%
                   left: 70.2%

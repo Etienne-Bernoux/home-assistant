@@ -12,10 +12,10 @@ views:
             heading: Maintenant
             icon: mdi:flash
           - type: tile
-            entity: sensor.garage_central_shellyemg4_84c7bb233c88_energy_meter_0_puissance
+            entity: sensor.annexe_puissance
             name: Puissance
           - type: tile
-            entity: sensor.shellyemg4_84c7bb233c88_energy_meter_0_courant
+            entity: sensor.annexe_courant
             name: Courant, ligne de 20 A
           - type: tile
             entity: sensor.prix_heures_pleines
@@ -42,7 +42,7 @@ views:
             title: Dernières 48 heures
             hours_to_show: 48
             entities:
-              - entity: sensor.garage_central_shellyemg4_84c7bb233c88_energy_meter_0_puissance
+              - entity: sensor.annexe_puissance
                 name: Puissance
       - type: grid
         cards:
@@ -50,7 +50,7 @@ views:
             heading: Consommation et coût
             icon: mdi:cash
           - type: statistic
-            entity: sensor.shellyemg4_84c7bb233c88_energy_meter_0_energie
+            entity: sensor.annexe_energie
             name: Aujourd'hui
             stat_type: change
             period:
@@ -64,7 +64,7 @@ views:
               calendar:
                 period: day
           - type: statistic
-            entity: sensor.shellyemg4_84c7bb233c88_energy_meter_0_energie
+            entity: sensor.annexe_energie
             name: Ce mois-ci
             stat_type: change
             period:
@@ -78,7 +78,7 @@ views:
               calendar:
                 period: month
           - type: statistic
-            entity: sensor.shellyemg4_84c7bb233c88_energy_meter_0_energie
+            entity: sensor.annexe_energie
             name: Mois dernier
             stat_type: change
             period:
@@ -96,7 +96,7 @@ views:
           - type: statistics-graph
             title: Consommation par jour
             entities:
-              - entity: sensor.shellyemg4_84c7bb233c88_energy_meter_0_energie
+              - entity: sensor.annexe_energie
                 name: Annexe
             stat_types:
               - change

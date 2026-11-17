@@ -27,19 +27,19 @@ automation:
     mode: single
     triggers:
       - trigger: numeric_state
-        entity_id: sensor.garage_central_shellyemg4_84c7bb233c88_energy_meter_0_puissance
+        entity_id: sensor.annexe_puissance
         above: input_number.annexe_puissance_coupure
         for: "00:00:30"
     conditions:
       - condition: state
-        entity_id: switch.garage_central_shellyemg4_84c7bb233c88
+        entity_id: switch.annexe_alimentation
         state: "on"
     actions:
       - variables:
-          power: "{{ states('sensor.garage_central_shellyemg4_84c7bb233c88_energy_meter_0_puissance') | float | round(0) | int }}"
+          power: "{{ states('sensor.annexe_puissance') | float | round(0) | int }}"
       - action: switch.turn_off
         target:
-          entity_id: switch.garage_central_shellyemg4_84c7bb233c88
+          entity_id: switch.annexe_alimentation
       - action: counter.increment
         target:
           entity_id: counter.annexe_coupures
@@ -61,7 +61,7 @@ automation:
               minutes: "{{ waits[attempt - 1] }}"
           - action: switch.turn_on
             target:
-              entity_id: switch.garage_central_shellyemg4_84c7bb233c88
+              entity_id: switch.annexe_alimentation
         else:
           - action: notify.mobile_app_pixel_6
             data:
@@ -76,11 +76,11 @@ automation:
     mode: single
     triggers:
       - trigger: state
-        entity_id: switch.garage_central_shellyemg4_84c7bb233c88
+        entity_id: switch.annexe_alimentation
         to: "off"
         id: switched_off
       - trigger: numeric_state
-        entity_id: sensor.garage_central_shellyemg4_84c7bb233c88_energy_meter_0_puissance
+        entity_id: sensor.annexe_puissance
         below: 5
         for: "00:02:00"
         id: no_power
@@ -90,7 +90,7 @@ automation:
           {% if trigger.id == 'switched_off' %}
             {{ trigger.to_state.context.parent_id is none }}
           {% else %}
-            {{ is_state('switch.garage_central_shellyemg4_84c7bb233c88', 'on') }}
+            {{ is_state('switch.annexe_alimentation', 'on') }}
           {% endif %}
     actions:
       - action: notify.mobile_app_pixel_6
@@ -109,7 +109,7 @@ automation:
     mode: restart
     triggers:
       - trigger: state
-        entity_id: switch.garage_central_shellyemg4_84c7bb233c88
+        entity_id: switch.annexe_alimentation
         to: "on"
         for: "00:30:00"
     actions:
@@ -129,7 +129,7 @@ template:
 
   - triggers:
       - trigger: state
-        entity_id: sensor.shellyemg4_84c7bb233c88_energy_meter_0_energie
+        entity_id: sensor.annexe_energie
     sensor:
       - name: Coût annexe
         unique_id: annex_cost
@@ -140,7 +140,7 @@ template:
         state: >
           {% from 'mylight.jinja' import ml_tariffs %}
           {% set peak = (ml_tariffs() | from_json | selectattr('from', '<=', now().date() | string) | list | last).peak %}
-          {% set energy = states('sensor.shellyemg4_84c7bb233c88_energy_meter_0_energie') %}
+          {% set energy = states('sensor.annexe_energie') %}
           {% set last = this.attributes.get('last_kwh') %}
           {% set total = this.state | float(0) %}
           {% if energy | is_number %}
@@ -152,5 +152,5 @@ template:
           {{ total | round(4) }}
         attributes:
           last_kwh: >
-            {% set energy = states('sensor.shellyemg4_84c7bb233c88_energy_meter_0_energie') %}
+            {% set energy = states('sensor.annexe_energie') %}
             {{ energy | float if energy | is_number else this.attributes.get('last_kwh') }}

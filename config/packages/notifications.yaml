@@ -87,7 +87,7 @@ automation:
     mode: single
     triggers:
       - trigger: numeric_state
-        entity_id: sensor.shellyemg4_84c7bb233c88_energy_meter_0_courant
+        entity_id: sensor.annexe_courant
         above: input_number.annexe_seuil_courant
         for: "00:15:00"
     actions:
@@ -95,7 +95,7 @@ automation:
         data:
           title: Annexe proche de la limite
           message: >
-            L'annexe tire {{ states('sensor.shellyemg4_84c7bb233c88_energy_meter_0_courant') | float | round(1) }} A
+            L'annexe tire {{ states('sensor.annexe_courant') | float | round(1) }} A
             depuis 15 minutes, au-dessus du seuil de {{ states('input_number.annexe_seuil_courant') | float }} A,
             sur une ligne de 20 A. Évitez d'y lancer en plus le four ou une machine.
 
@@ -104,12 +104,12 @@ automation:
     mode: single
     triggers:
       - trigger: state
-        entity_id: switch.shellyplugmg3_083af2d920c0
+        entity_id: switch.prise_cellier
         to: "off"
         for: "00:01:00"
         id: switched_off
       - trigger: state
-        entity_id: switch.shellyplugmg3_083af2d920c0
+        entity_id: switch.prise_cellier
         to: unavailable
         for: "00:10:00"
         id: unreachable
