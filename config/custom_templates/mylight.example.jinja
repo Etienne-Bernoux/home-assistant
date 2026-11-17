@@ -22,3 +22,10 @@
 {% macro baseline() -%}
 {"ml_energy_eur": 0, "edf_panels_eur": 0, "no_panels_eur": 0, "contribution_start": "2025-01-01"}
 {%- endmacro %}
+
+{% macro annex_billing() -%}
+{"trv_peak": 0.2142, "shelly_start": "2025-06-01T00:00:00+00:00", "reference_kwh": 5000.0, "readings": [
+  {"date": "2024-12-01", "index": 1000.0},
+  {"date": "2025-06-01", "index": 3500.0, "price": 0.2540}
+]}
+{%- endmacro %}

@@ -77,6 +77,22 @@ views:
             period:
               calendar:
                 period: month
+          - type: statistic
+            entity: sensor.annexe_energie
+            name: Mois dernier
+            stat_type: change
+            period:
+              calendar:
+                period: month
+                offset: -1
+          - type: statistic
+            entity: sensor.cout_annexe
+            name: Mois dernier
+            stat_type: change
+            period:
+              calendar:
+                period: month
+                offset: -1
           - type: statistics-graph
             title: Consommation par jour
             entities:
@@ -105,7 +121,10 @@ views:
               **Calcul.** Chaque kWh mesuré par le Shelly EM sur la ligne de l'annexe est compté au
               prix heures pleines en vigueur ce jour-là, même la nuit et même quand le solaire couvre
               la maison, comme si l'annexe avait son propre compteur au tarif le plus cher. Mesure
-              depuis le 16 novembre 2026. Une alerte part sur le téléphone si la ligne dépasse le
+              du Shelly depuis le 16 novembre 2026 ; avant, les relevés du sous-compteur depuis
+              janvier 2024, répartis à parts égales sur les jours de chaque période et comptés au
+              prix facturé de la période (du 3 au 16 novembre 2026, estimés au rythme du relevé
+              précédent). Une alerte part sur le téléphone si la ligne dépasse le
               seuil réglé ci-dessus pendant 15 minutes (18 A conseillé sur cette ligne de 20 A).
               **Coupure.** Au-delà de la puissance de coupure pendant 30 secondes, le Shelly coupe
               toute l'annexe, puis la rallume seul après 1, 1, 3, 5 et 10 minutes ; à la sixième

@@ -1,6 +1,6 @@
 title: Rentabilité
 views:
-  - title: Rentabilité
+  - title: Avec l'annexe
     path: rentabilite
     icon: mdi:cash-check
     type: sections
@@ -75,6 +75,90 @@ views:
               coût MyLight comparé à toute la consommation au Tarif Bleu. Abonnement réseau exclu
               des deux côtés. Prix MyLight supposé égal au Tarif Bleu jusqu'au 31 octobre 2026.
               Remboursements : coût du matériel MyLight et de l'installation complète (catalogue `investments`), au gain et à l'économie annuels attendus aux tarifs et forfait en vigueur sur les volumes de l'année de référence. Historique antérieur à la mise en service calculé au pas journalier (75 % heures pleines).
+  - title: Sans l'annexe
+    path: sans-annexe
+    icon: mdi:home-account
+    type: sections
+    max_columns: 2
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: MyLight face à EDF Tarif Bleu, annexe refacturée
+            icon: mdi:battery-heart-variant
+          - type: tile
+            entity: sensor.gain_mylight_cumule_annexe_refacturee
+            name: Gain cumulé
+          - type: tile
+            entity: sensor.gain_mylight_annuel_attendu_annexe_refacturee
+            name: Gain par an
+          - type: tile
+            entity: sensor.remboursement_mylight_estime_annexe_refacturee
+            name: Matériel MyLight remboursé le
+          - type: statistic
+            entity: sensor.gain_mylight_cumule_annexe_refacturee
+            name: Gain sur 12 mois
+            stat_type: change
+            period:
+              rolling_window:
+                duration:
+                  days: 365
+          - type: statistics-graph
+            title: Gain par mois
+            entities:
+              - sensor.gain_mylight_cumule_annexe_refacturee
+            stat_types:
+              - change
+            period: month
+            chart_type: bar
+            days_to_show: 600
+      - type: grid
+        cards:
+          - type: heading
+            heading: Amortissement, annexe refacturée
+            icon: mdi:solar-power-variant
+          - type: tile
+            entity: sensor.economie_installation_cumulee_annexe_refacturee
+            name: Économie cumulée
+          - type: tile
+            entity: sensor.amortissement_installation_annexe_refacturee
+            name: Part remboursée
+          - type: tile
+            entity: sensor.economie_annuelle_attendue_annexe_refacturee
+            name: Économie par an
+          - type: tile
+            entity: sensor.retour_sur_investissement_estime_annexe_refacturee
+            name: Installation remboursée le
+          - type: tile
+            entity: sensor.majoration_refacturee_a_l_annexe
+            name: Majoration refacturée, cumul
+          - type: tile
+            entity: sensor.majoration_annuelle_attendue_de_l_annexe
+            name: Majoration refacturée par an
+          - type: statistics-graph
+            title: Économie par mois
+            entities:
+              - sensor.economie_installation_cumulee_annexe_refacturee
+            stat_types:
+              - change
+            period: month
+            chart_type: bar
+            days_to_show: 600
+      - type: grid
+        column_span: 2
+        cards:
+          - type: markdown
+            content: >
+              **Annexe refacturée.** L'annexe est une cliente : elle doit ses kWh au prix heures
+              pleines le plus cher de chaque période relevée au sous-compteur (catalogue
+              `annex_billing`), puis, depuis le 16 novembre 2026, à celui en vigueur sur les kWh
+              mesurés par le Shelly. Sans panneaux ni MyLight, elle paierait le Tarif Bleu heures
+              pleines (0,2142 €). La majoration est l'écart entre les deux, sur ses kWh depuis la
+              mise en service : elle s'ajoute au gain et à l'économie de la page « Avec l'annexe ».
+              Entre le dernier relevé et l'arrivée du Shelly, sa consommation est estimée au rythme
+              du dernier relevé ; un nouveau relevé la remplace. Le dû est compté, payé ou non.
+              Les kWh annuels attendus de l'annexe sont ceux de l'année de référence, au prorata
+              des relevés.
   - title: Solaire
     path: solaire
     icon: mdi:solar-power-variant

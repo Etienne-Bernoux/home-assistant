@@ -193,3 +193,137 @@ template:
         state: >
           {{ (states('sensor.envoy_122333060519_consommation_nette_de_puissance_actuelle') | float
               - states('sensor.puissance_batterie_virtuelle') | float) | round(3) }}
+
+  - triggers:
+      - trigger: state
+        entity_id: sensor.annexe_energie
+    sensor:
+      - name: Majoration annexe mesurée
+        unique_id: annex_billing_premium_measured
+        icon: mdi:cash-plus
+        unit_of_measurement: EUR
+        state: >
+          {% from 'mylight.jinja' import ml_tariffs, annex_billing %}
+          {% set billing = annex_billing() | from_json %}
+          {% set peak = (ml_tariffs() | from_json | selectattr('from', '<=', now().date() | string) | list | last).peak %}
+          {% set energy = states('sensor.annexe_energie') %}
+          {% set total = this.state | float(0) if this.attributes.get('since') == billing.readings[-1].date else 0 %}
+          {% if energy | is_number %}
+            {% set delta = energy | float - this.attributes.get('last_kwh', 0) | float(0) %}
+            {% if delta > 0 %}
+              {% set total = total + delta * (peak - billing.trv_peak) %}
+            {% endif %}
+          {% endif %}
+          {{ total | round(4) }}
+        attributes:
+          since: >
+            {% from 'mylight.jinja' import annex_billing %}
+            {{ (annex_billing() | from_json).readings[-1].date }}
+          last_kwh: >
+            {% set energy = states('sensor.annexe_energie') %}
+            {{ energy | float if energy | is_number else this.attributes.get('last_kwh', 0) }}
+
+  - sensor:
+      - name: Majoration refacturée à l'annexe
+        unique_id: annex_billing_premium_total
+        icon: mdi:cash-plus
+        unit_of_measurement: EUR
+        device_class: monetary
+        state_class: total
+        availability: "{{ states('sensor.majoration_annexe_mesuree') | is_number }}"
+        state: >
+          {% from 'mylight.jinja' import ml_tariffs, annex_billing, baseline %}
+          {% set billing = annex_billing() | from_json %}
+          {% set peak = (ml_tariffs() | from_json | selectattr('from', '<=', now().date() | string) | list | last).peak %}
+          {% set start = as_datetime((baseline() | from_json).contribution_start ~ 'T00:00:00').replace(tzinfo=now().tzinfo) %}
+          {% set r = billing.readings %}
+          {% set ns = namespace(total=0, rate=0) %}
+          {% for i in range(1, r | count) %}
+            {% set a = as_datetime(r[i - 1].date ~ 'T00:00:00').replace(tzinfo=now().tzinfo) %}
+            {% set b = as_datetime(r[i].date ~ 'T00:00:00').replace(tzinfo=now().tzinfo) %}
+            {% set ns.rate = (r[i].index - r[i - 1].index) / ((b - a).total_seconds() / 86400) %}
+            {% set begin = [a, start] | max %}
+            {% if b > begin %}
+              {% set ns.total = ns.total + ns.rate * (b - begin).total_seconds() / 86400 * (r[i].price - billing.trv_peak) %}
+            {% endif %}
+          {% endfor %}
+          {% set last = as_datetime(r[-1].date ~ 'T00:00:00').replace(tzinfo=now().tzinfo) %}
+          {% set gap_end = [now(), as_datetime(billing.shelly_start)] | min %}
+          {% if gap_end > last %}
+            {% set ns.total = ns.total + ns.rate * (gap_end - last).total_seconds() / 86400 * (peak - billing.trv_peak) %}
+          {% endif %}
+          {{ (ns.total + states('sensor.majoration_annexe_mesuree') | float) | round(2) }}
+      - name: Gain MyLight cumulé, annexe refacturée
+        unique_id: mylight_gain_total_annex_billed
+        icon: mdi:battery-heart-variant
+        unit_of_measurement: EUR
+        device_class: monetary
+        state_class: total
+        availability: "{{ states('sensor.gain_mylight_cumule') | is_number and states('sensor.majoration_refacturee_a_l_annexe') | is_number }}"
+        state: "{{ (states('sensor.gain_mylight_cumule') | float + states('sensor.majoration_refacturee_a_l_annexe') | float) | round(2) }}"
+      - name: Économie installation cumulée, annexe refacturée
+        unique_id: solar_savings_total_annex_billed
+        icon: mdi:solar-power-variant
+        unit_of_measurement: EUR
+        device_class: monetary
+        state_class: total
+        availability: "{{ states('sensor.economie_installation_cumulee') | is_number and states('sensor.majoration_refacturee_a_l_annexe') | is_number }}"
+        state: "{{ (states('sensor.economie_installation_cumulee') | float + states('sensor.majoration_refacturee_a_l_annexe') | float) | round(2) }}"
+      - name: Amortissement installation, annexe refacturée
+        unique_id: solar_payback_progress_annex_billed
+        icon: mdi:progress-check
+        unit_of_measurement: "%"
+        state_class: measurement
+        availability: "{{ states('sensor.economie_installation_cumulee_annexe_refacturee') | is_number }}"
+        state: >
+          {% from 'mylight.jinja' import investments %}
+          {{ (states('sensor.economie_installation_cumulee_annexe_refacturee') | float / (investments() | from_json).installation_total * 100) | round(1) }}
+      - name: Majoration annuelle attendue de l'annexe
+        unique_id: annex_billing_premium_expected_yearly
+        icon: mdi:cash-plus
+        unit_of_measurement: EUR
+        state: >
+          {% from 'mylight.jinja' import ml_tariffs, annex_billing %}
+          {% set billing = annex_billing() | from_json %}
+          {% set peak = (ml_tariffs() | from_json | selectattr('from', '<=', now().date() | string) | list | last).peak %}
+          {{ (billing.reference_kwh * (peak - billing.trv_peak)) | round(0) }}
+      - name: Économie annuelle attendue, annexe refacturée
+        unique_id: solar_savings_expected_yearly_annex_billed
+        icon: mdi:chart-line
+        unit_of_measurement: EUR
+        state: "{{ (states('sensor.economie_annuelle_attendue') | float(0) + states('sensor.majoration_annuelle_attendue_de_l_annexe') | float(0)) | round(0) }}"
+      - name: Gain MyLight annuel attendu, annexe refacturée
+        unique_id: mylight_gain_expected_yearly_annex_billed
+        icon: mdi:chart-line
+        unit_of_measurement: EUR
+        state: "{{ (states('sensor.gain_mylight_annuel_attendu') | float(0) + states('sensor.majoration_annuelle_attendue_de_l_annexe') | float(0)) | round(0) }}"
+      - name: Remboursement MyLight estimé, annexe refacturée
+        unique_id: mylight_payback_date_annex_billed
+        icon: mdi:calendar-check
+        device_class: date
+        availability: >
+          {{ states('sensor.gain_mylight_cumule_annexe_refacturee') | is_number
+             and states('sensor.gain_mylight_annuel_attendu_annexe_refacturee') | float(0) > 0 }}
+        state: >
+          {% from 'mylight.jinja' import investments %}
+          {% set remaining = (investments() | from_json).mylight_hardware - states('sensor.gain_mylight_cumule_annexe_refacturee') | float %}
+          {% if remaining <= 0 %}
+            {{ now().date() }}
+          {% else %}
+            {{ (now() + timedelta(days=remaining / (states('sensor.gain_mylight_annuel_attendu_annexe_refacturee') | float) * 365.25)).date() }}
+          {% endif %}
+      - name: Retour sur investissement estimé, annexe refacturée
+        unique_id: solar_payback_date_annex_billed
+        icon: mdi:calendar-check
+        device_class: date
+        availability: >
+          {{ states('sensor.economie_installation_cumulee_annexe_refacturee') | is_number
+             and states('sensor.economie_annuelle_attendue_annexe_refacturee') | float(0) > 0 }}
+        state: >
+          {% from 'mylight.jinja' import investments %}
+          {% set remaining = (investments() | from_json).installation_total - states('sensor.economie_installation_cumulee_annexe_refacturee') | float %}
+          {% if remaining <= 0 %}
+            {{ now().date() }}
+          {% else %}
+            {{ (now() + timedelta(days=remaining / (states('sensor.economie_annuelle_attendue_annexe_refacturee') | float) * 365.25)).date() }}
+          {% endif %}
