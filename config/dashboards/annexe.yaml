@@ -77,22 +77,6 @@ views:
             period:
               calendar:
                 period: month
-          - type: statistic
-            entity: sensor.annexe_energie
-            name: Mois dernier
-            stat_type: change
-            period:
-              calendar:
-                period: month
-                offset: -1
-          - type: statistic
-            entity: sensor.cout_annexe
-            name: Mois dernier
-            stat_type: change
-            period:
-              calendar:
-                period: month
-                offset: -1
           - type: statistics-graph
             title: Consommation par jour
             entities:

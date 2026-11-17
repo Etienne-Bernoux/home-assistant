@@ -13,16 +13,16 @@ template:
         state: "{{ now().isoformat() }}"
         attributes:
           day: "{{ now().date() | string }}"
-          last_bought: "{{ states('sensor.mylight_systems_consommation_reseau_sans_batterie_virtuelle') | float(this.attributes.get('last_bought', 0) | float(0)) | round(3) }}"
-          last_returned: "{{ states('sensor.mylight_systems_decharge_batterie') | float(this.attributes.get('last_returned', 0) | float(0)) | round(3) }}"
-          last_green: "{{ states('sensor.mylight_systems_energie_verte_solaire_direct') | float(this.attributes.get('last_green', 0) | float(0)) | round(3) }}"
-          last_reinjected: "{{ states('sensor.mylight_systems_energie_reinjectee_au_reseau') | float(this.attributes.get('last_reinjected', 0) | float(0)) | round(3) }}"
+          last_bought: "{{ states('sensor.mylight_systems_consommation_reseau_sans_batterie_virtuelle') | float(this.attributes.get('last_bought', 0) | float(0)) }}"
+          last_returned: "{{ states('sensor.mylight_systems_decharge_batterie') | float(this.attributes.get('last_returned', 0) | float(0)) }}"
+          last_green: "{{ states('sensor.mylight_systems_energie_verte_solaire_direct') | float(this.attributes.get('last_green', 0) | float(0)) }}"
+          last_reinjected: "{{ states('sensor.mylight_systems_energie_reinjectee_au_reseau') | float(this.attributes.get('last_reinjected', 0) | float(0)) }}"
           ml_energy_eur: >
             {% from 'mylight.jinja' import baseline %}
             {% macro delta(entity, last) -%}
               {%- set cur = states(entity) | float(none) -%}
               {%- set last = last | float(0) -%}
-              {{- 0 if cur is none else (cur - last if cur >= last else cur) -}}
+              {{- 0 if cur is none else (cur - last if cur >= last else (cur if cur < last * 0.5 else 0)) -}}
             {%- endmacro %}
             {% set same_day = this.attributes.get('day') == now().date() | string %}
             {% set bought = delta('sensor.mylight_systems_consommation_reseau_sans_batterie_virtuelle', this.attributes.get('last_bought', 0) if same_day else 0) | float / 1000 %}
@@ -34,7 +34,7 @@ template:
             {% macro delta(entity, last) -%}
               {%- set cur = states(entity) | float(none) -%}
               {%- set last = last | float(0) -%}
-              {{- 0 if cur is none else (cur - last if cur >= last else cur) -}}
+              {{- 0 if cur is none else (cur - last if cur >= last else (cur if cur < last * 0.5 else 0)) -}}
             {%- endmacro %}
             {% set same_day = this.attributes.get('day') == now().date() | string %}
             {% set bought = delta('sensor.mylight_systems_consommation_reseau_sans_batterie_virtuelle', this.attributes.get('last_bought', 0) if same_day else 0) | float / 1000 %}
@@ -46,7 +46,7 @@ template:
             {% macro delta(entity, last) -%}
               {%- set cur = states(entity) | float(none) -%}
               {%- set last = last | float(0) -%}
-              {{- 0 if cur is none else (cur - last if cur >= last else cur) -}}
+              {{- 0 if cur is none else (cur - last if cur >= last else (cur if cur < last * 0.5 else 0)) -}}
             {%- endmacro %}
             {% set same_day = this.attributes.get('day') == now().date() | string %}
             {% set bought = delta('sensor.mylight_systems_consommation_reseau_sans_batterie_virtuelle', this.attributes.get('last_bought', 0) if same_day else 0) | float / 1000 %}
@@ -161,7 +161,7 @@ template:
       - name: État de charge batterie virtuelle
         unique_id: mylight_virtual_battery_soc
         unit_of_measurement: "%"
-        device_class: battery
+        icon: mdi:battery-heart-variant
         state_class: measurement
         availability: "{{ states('sensor.mylight_systems_energie_stockee_en_batterie') | is_number }}"
         state: >

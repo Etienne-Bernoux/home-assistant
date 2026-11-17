@@ -166,6 +166,37 @@ automation:
             le thermostat ne coupe plus avant la fin des heures creuses. Contrôlez la résistance,
             et faites une chauffe complète contre les légionelles.
 
+  - id: solar_inverter_underperforming
+    alias: Alerter si un micro-onduleur a produit moins de la moitié des autres
+    mode: single
+    triggers:
+      - trigger: sun
+        event: sunset
+        offset: "-00:30:00"
+    variables:
+      daily: >
+        {% set ns = namespace(items=[]) %}
+        {% for s in states.sensor | selectattr('entity_id', 'match', 'sensor\.inverter_\d+_production_d_energie_du_jour$') %}
+          {% set ns.items = ns.items + [{'serial': s.entity_id.split('_')[1][-4:], 'wh': s.state | float(-1)}] %}
+        {% endfor %}
+        {{ ns.items }}
+      median: >
+        {% set values = daily | map(attribute='wh') | select('ge', 0) | sort | list %}
+        {{ values[values | count // 2] if values else 0 }}
+      weak: "{{ daily | selectattr('wh', 'lt', median * 0.5) | map(attribute='serial') | list }}"
+    conditions:
+      - condition: template
+        value_template: "{{ median > 50 and weak | count > 0 }}"
+    actions:
+      - action: notify.mobile_app_pixel_6
+        data:
+          title: Panneaux solaires
+          message: >
+            {{ weak | count }} micro-onduleur{{ 's' if weak | count > 1 else '' }}
+            ({{ weak | join(', ') }})
+            {{ 'ont' if weak | count > 1 else 'a' }} produit moins de la moitié des {{ median | round(0) | int }} Wh
+            des autres aujourd'hui : panne, ombre nouvelle ou panneau sale. Voir la page Solaire.
+
   - id: yoto_charge_reminder
     alias: Rappeler de recharger les Yoto avant la nuit
     mode: single
