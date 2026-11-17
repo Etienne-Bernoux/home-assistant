@@ -12,7 +12,7 @@ input_number:
     icon: mdi:flash-off
     unit_of_measurement: W
     min: 2000
-    max: 5000
+    max: 5400
     step: 100
     mode: box
 
