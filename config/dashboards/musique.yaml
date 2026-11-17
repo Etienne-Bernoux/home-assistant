@@ -102,8 +102,42 @@ views:
           - type: heading
             heading: En cours
             icon: mdi:music-note
+          - type: markdown
+            content: Rien ne joue. Choisis une pièce et quoi écouter, puis Lancer.
+            visibility:
+              - condition: state
+                entity: media_player.echo_bureau
+                state_not:
+                  - playing
+                  - paused
+              - condition: state
+                entity: media_player.echo_dot_salon
+                state_not:
+                  - playing
+                  - paused
+              - condition: state
+                entity: media_player.echo_dot_cuisine
+                state_not:
+                  - playing
+                  - paused
+              - condition: state
+                entity: media_player.4eme_echo_dot_etienne
+                state_not:
+                  - playing
+                  - paused
+              - condition: state
+                entity: media_player.partout
+                state_not:
+                  - playing
+                  - paused
           - type: tile
             entity: media_player.echo_bureau
+            visibility:
+              - condition: state
+                entity: media_player.echo_bureau
+                state:
+                  - playing
+                  - paused
             name: Bureau
             state_content:
               - state
@@ -116,6 +150,12 @@ views:
               - type: media-player-volume-slider
           - type: tile
             entity: media_player.echo_dot_salon
+            visibility:
+              - condition: state
+                entity: media_player.echo_dot_salon
+                state:
+                  - playing
+                  - paused
             name: Salon
             state_content:
               - state
@@ -128,6 +168,12 @@ views:
               - type: media-player-volume-slider
           - type: tile
             entity: media_player.echo_dot_cuisine
+            visibility:
+              - condition: state
+                entity: media_player.echo_dot_cuisine
+                state:
+                  - playing
+                  - paused
             name: Cuisine
             state_content:
               - state
@@ -140,6 +186,12 @@ views:
               - type: media-player-volume-slider
           - type: tile
             entity: media_player.4eme_echo_dot_etienne
+            visibility:
+              - condition: state
+                entity: media_player.4eme_echo_dot_etienne
+                state:
+                  - playing
+                  - paused
             name: Salle de jeu
             state_content:
               - state
@@ -152,6 +204,12 @@ views:
               - type: media-player-volume-slider
           - type: tile
             entity: media_player.partout
+            visibility:
+              - condition: state
+                entity: media_player.partout
+                state:
+                  - playing
+                  - paused
             name: Partout
             state_content:
               - state
