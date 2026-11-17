@@ -41,7 +41,7 @@ Configuration versionnée d'un Home Assistant domestique (Raspberry Pi 4, Home A
 ./scripts/deploy.sh
 ```
 
-Copie `configuration.yaml`, `packages/`, `custom_templates/`, `dashboards/` et `www/` sur le Pi (ils y sont remplacés en entier, sauf `www/community/`, réservé au Marketplace ; `custom_components/` n'est pas touché), puis lance `ha core check`. La version précédente est gardée dans `/config/.deploy-previous` et remise en place automatiquement si le check échoue ; le script sort alors en erreur. Un nouveau package ou un changement de `configuration.yaml` demande ensuite un redémarrage de Home Assistant ; un changement de template ou d'automatisation se recharge sans redémarrage.
+Copie `configuration.yaml`, `packages/`, `custom_templates/`, `dashboards/` et `www/` sur le Pi (ils y sont remplacés en entier, sauf `www/community/`, réservé au Marketplace ; `custom_components/` n'est pas touché), puis lance `ha core check`. Hors du réseau local, `HA_SSH_OPTS` passe des options à `ssh` (par exemple l'adresse Tailscale du Pi, cf. `LOCAL.md`). La version précédente est gardée dans `/config/.deploy-previous` et remise en place automatiquement si le check échoue ; le script sort alors en erreur. Un nouveau package ou un changement de `configuration.yaml` demande ensuite un redémarrage de Home Assistant ; un changement de template ou d'automatisation se recharge sans redémarrage.
 
 Après le premier redémarrage qui crée `weather_advice.yaml`, régler les trois seuils dans l'onglet Températures (28 °C, 1 °C, 0,5 mm) : sans valeur posée, ils partent du minimum de leur plage. Après une modification de `weather_advice.jinja`, recharger les templates personnalisés (`homeassistant.reload_custom_templates`) puis lancer les tests :
 

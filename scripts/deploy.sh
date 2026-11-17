@@ -3,7 +3,9 @@ set -euo pipefail
 
 cd "$(dirname "$0")/../config"
 
-COPYFILE_DISABLE=1 tar --exclude .claude -cf - configuration.yaml packages custom_templates dashboards www | ssh ha '
+read -r -a ssh_opts <<< "${HA_SSH_OPTS:-}"
+
+COPYFILE_DISABLE=1 tar --exclude .claude -cf - configuration.yaml packages custom_templates dashboards www | ssh ${ssh_opts[@]+"${ssh_opts[@]}"} ha '
 set -eu
 cd /config
 set -- configuration.yaml packages custom_templates dashboards
