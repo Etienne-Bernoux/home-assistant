@@ -49,6 +49,25 @@ template:
         icon: mdi:water-boiler-off
         state: "{{ is_state('binary_sensor.chauffe_eau_en_chauffe', 'on') }}"
 
+  - triggers:
+      - trigger: state
+        entity_id: binary_sensor.chauffe_eau_en_chauffe
+        from: "on"
+        to: "off"
+        for: "00:03:00"
+    conditions:
+      - condition: state
+        entity_id: switch.chauffe_eau_relais
+        state: "on"
+      - condition: template
+        value_template: "{{ trigger.to_state.last_changed - trigger.from_state.last_changed > timedelta(minutes=10) }}"
+    sensor:
+      - name: Chauffe-eau dernière fois à température
+        unique_id: water_heater_last_full
+        device_class: timestamp
+        icon: mdi:water-boiler
+        state: "{{ trigger.to_state.last_changed.isoformat() }}"
+
 automation:
   - id: water_heater_preheat
     alias: Avancer d'une heure la chauffe si le ballon n'a pas fini la précédente

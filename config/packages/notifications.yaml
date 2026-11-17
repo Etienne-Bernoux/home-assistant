@@ -144,6 +144,28 @@ automation:
             {% endif %}
             Vérifiez le mode du relais dans l'application MyLight.
 
+  - id: water_heater_not_full_for_a_week
+    alias: Alerter si le chauffe-eau n'a pas atteint sa consigne depuis 7 jours
+    mode: single
+    triggers:
+      - trigger: time
+        at: "08:00:00"
+    variables:
+      last: "{{ states('sensor.chauffe_eau_derniere_fois_a_temperature') }}"
+    conditions:
+      - condition: template
+        value_template: >
+          {% set t = last | as_datetime(none) %}
+          {{ t is not none and now() - t > timedelta(days=7) }}
+    actions:
+      - action: notify.mobile_app_pixel_6
+        data:
+          title: Chauffe-eau
+          message: >
+            Le ballon n'a pas atteint sa consigne de 60 °C depuis le {{ as_local(last | as_datetime).strftime('%d/%m') }} :
+            le thermostat ne coupe plus avant la fin des heures creuses. Contrôlez la résistance,
+            et faites une chauffe complète contre les légionelles.
+
   - id: yoto_charge_reminder
     alias: Rappeler de recharger les Yoto avant la nuit
     mode: single
