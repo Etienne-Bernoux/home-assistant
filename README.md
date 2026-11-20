@@ -25,6 +25,7 @@ Configuration versionnée d'un Home Assistant domestique (Raspberry Pi 4, Home A
 | `config/custom_templates/mylight.example.jinja` | Catalogue daté des tarifs, forfaits, volumes de référence, investissements et relevés du sous-compteur de l'annexe, avec des valeurs fictives |
 | `scripts/deploy.sh` | Déploiement sur le Pi avec retour arrière |
 | `scripts/import-battery-history.mjs` | Import de l'historique horaire officiel du stock de la batterie virtuelle depuis l'API MyLight (`HA_URL`, `HA_TOKEN`, identifiants MyLight dans le trousseau macOS, entrée `mylight`) |
+| `scripts/rebuild-energy-gap.mjs` | Rattrapage d'une panne de Home Assistant (`--from`, `--to` : première et dernière heure UTC fausses, `--dry-run`) : réécrit heure par heure les statistiques de la page Énergie et des compteurs de l'installation depuis la source la plus précise, flux MyLight et chauffe-eau depuis l'historique horaire MyLight, annexe et son coût depuis la mémoire minute du Shelly EM (`SHELLY_ANNEX_URL`, environ trois jours), production et prises depuis leurs relevés, trous répartis selon la courbe MyLight pour la production et à parts égales pour les prises, reporte l'écart sur les heures suivantes, et donne la correction à ajouter une fois aux cumuls de la page Rentabilité quand la panne a passé minuit (`HA_URL`, `HA_TOKEN`, identifiants MyLight dans le trousseau macOS, entrée `mylight`) |
 | `scripts/import-radiation-history.mjs` | Import de l'historique horaire d'ensoleillement Open-Meteo depuis mars 2025, à lancer une seule fois, au moins 5 minutes après le premier démarrage du capteur, pour que la série se raccorde au cumul en cours (`HA_URL`, `HA_TOKEN`) |
 | `scripts/test-weather-advice.mjs` | Tests de `weather_advice.jinja` sur le Pi avec des prévisions fabriquées (`HA_URL`, `HA_TOKEN`) |
 
@@ -48,6 +49,16 @@ Après le premier redémarrage qui crée `weather_advice.yaml`, régler les troi
 ```bash
 HA_URL=http://192.168.1.250 HA_TOKEN=… node scripts/test-weather-advice.mjs
 ```
+
+## Rattraper une panne
+
+Une fois Home Assistant revenu et au moins trois heures après la dernière heure fausse, lancer le rattrapage à blanc puis pour de bon, et le relancer à blanc pour vérifier qu'il ne reporte plus rien :
+
+```bash
+HA_URL=http://192.168.1.250 HA_TOKEN=… SHELLY_ANNEX_URL=http://<ip du Shelly de l'annexe> node scripts/rebuild-energy-gap.mjs --from=2026-11-18T07:00:00Z --to=2026-11-20T06:00:00Z --dry-run
+```
+
+S'il annonce une correction de la page Rentabilité, l'ajouter une seule fois aux trois attributs de `sensor.rentabilite_mylight_compteurs` : dans `mylight_profitability.yaml`, ajouter le montant à chaque formule sous la condition d'un attribut drapeau absent, poser cet attribut à `true`, déployer, recharger les templates, vérifier que le gain et l'économie ont bougé du montant annoncé, puis retirer le code et redéployer. La courbe de puissance en direct ne se rattrape pas.
 
 ## Ce qui n'est pas dans ce dépôt
 
