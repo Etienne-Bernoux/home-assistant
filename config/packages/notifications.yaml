@@ -40,6 +40,31 @@ automation:
               Coupure de {{ ((now() - trigger.from_state.last_changed).total_seconds() / 60) | round(0) | int }} minutes.
             {% endif %}
 
+  - id: alexa_temperatures_reload
+    alias: Recharger l'intégration Alexa quand les températures des Echo tombent
+    mode: single
+    triggers:
+      - trigger: template
+        value_template: >
+          {{ ['sensor.echo_bureau_temperature', 'sensor.echo_dot_salon_temperature', 'sensor.echo_dot_cuisine_temperature']
+             | map('states') | reject('in', ['unavailable', 'unknown']) | list | count == 0 }}
+        for: "00:15:00"
+    actions:
+      - action: homeassistant.reload_config_entry
+        target:
+          entity_id: sensor.echo_bureau_temperature
+      - wait_template: "{{ states('sensor.echo_bureau_temperature') | is_number }}"
+        timeout: "00:02:00"
+      - action: notify.mobile_app_pixel_6
+        data:
+          title: Températures des Echo
+          message: >
+            {% if wait.completed %}
+              Les trois Echo ne donnaient plus leur température depuis 15 minutes : l'intégration Alexa a été rechargée, elles sont revenues.
+            {% else %}
+              Les trois Echo ne donnent plus leur température depuis 15 minutes, et recharger l'intégration Alexa n'a pas suffi.
+            {% endif %}
+
   - id: alert_backup_failed
     alias: Alerter si une sauvegarde échoue ou manque
     mode: single
