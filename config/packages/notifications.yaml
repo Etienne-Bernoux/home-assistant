@@ -124,6 +124,45 @@ automation:
               La prise du congélateur et du petit frigo ne répond plus depuis 10 minutes : coupure de courant ou disjoncteur.
             {% endif %}
 
+  - id: pump_plug_off
+    alias: Rallumer la prise de la pompe après une coupure de protection
+    mode: queued
+    triggers:
+      - trigger: state
+        entity_id: switch.prise_pompe
+        from: "on"
+        to: "off"
+        id: switched_off
+      - trigger: state
+        entity_id: switch.prise_pompe
+        to: unavailable
+        for: "00:10:00"
+        id: unreachable
+    variables:
+      protection: >
+        {{ is_state('binary_sensor.shellyplugmg3_b81f3f49d230_surintensite', 'on')
+           or is_state('binary_sensor.shellyplugmg3_b81f3f49d230_surcharge', 'on')
+           or is_state('binary_sensor.shellyplugmg3_b81f3f49d230_surchauffe', 'on') }}
+    actions:
+      - if:
+          - condition: template
+            value_template: "{{ trigger.id == 'switched_off' and protection }}"
+        then:
+          - action: switch.turn_on
+            target:
+              entity_id: switch.prise_pompe
+      - action: notify.mobile_app_pixel_6
+        data:
+          title: Pompe
+          message: >
+            {% if trigger.id == 'unreachable' %}
+              La prise de la pompe ne répond plus depuis 10 minutes : coupure de courant ou disjoncteur. Sans elle, la maison n'a plus d'eau.
+            {% elif protection %}
+              La prise de la pompe a coupé sur une protection (surintensité, surcharge ou surchauffe), sans doute au démarrage du moteur. Home Assistant l'a rallumée.
+            {% else %}
+              La prise de la pompe est éteinte : la maison n'a plus d'eau. Rallumez-la depuis Home Assistant.
+            {% endif %}
+
   - id: water_heater_missed_heating
     alias: Alerter si le chauffe-eau n'a pas chauffé pendant les heures creuses
     mode: single

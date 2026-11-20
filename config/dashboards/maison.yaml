@@ -38,6 +38,11 @@ views:
                 style:
                   top: 50%
                   left: 50%
+              - type: state-label
+                entity: sensor.prise_lave_vaisselle_puissance
+                style:
+                  top: 65.1%
+                  left: 43%
               - type: conditional
                 conditions:
                   - entity: vacuum.qrevo_s_pro_series
@@ -293,6 +298,11 @@ views:
                 style:
                   top: 42.5%
                   left: 65.3%
+              - type: state-label
+                entity: sensor.prise_pompe_puissance
+                style:
+                  top: 49.7%
+                  left: 80.8%
               - type: state-icon
                 entity: switch.chauffe_eau_relais
                 icon: mdi:electric-switch
