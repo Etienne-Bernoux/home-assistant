@@ -170,9 +170,9 @@ automation:
         id: unreachable
     variables:
       protection: >
-        {{ is_state('binary_sensor.shellyplugmg3_b81f3f49d230_surintensite', 'on')
-           or is_state('binary_sensor.shellyplugmg3_b81f3f49d230_surcharge', 'on')
-           or is_state('binary_sensor.shellyplugmg3_b81f3f49d230_surchauffe', 'on') }}
+        {{ is_state('binary_sensor.prise_pompe_surintensite', 'on')
+           or is_state('binary_sensor.prise_pompe_surcharge', 'on')
+           or is_state('binary_sensor.prise_pompe_surchauffe', 'on') }}
     actions:
       - if:
           - condition: template
@@ -186,13 +186,13 @@ automation:
           title: Pompe
           message: >
             {% if trigger.id == 'unreachable' %}
-              La prise de la pompe ne répond plus depuis 10 minutes : coupure de courant ou disjoncteur. Sans elle, la maison n'a plus d'eau.
+              Le Shelly de la pompe ne répond plus depuis 10 minutes : coupure de courant ou disjoncteur. Sans lui, la maison n'a plus d'eau.
             {% elif trigger.id == 'still_off' %}
-              La prise de la pompe reste éteinte depuis 1 minute : la maison n'a plus d'eau. Rallumez-la depuis Home Assistant.
+              Le Shelly de la pompe reste éteint depuis 1 minute : la maison n'a plus d'eau. Rallumez-le depuis Home Assistant.
             {% elif protection %}
-              La prise de la pompe a coupé sur une protection (surintensité, surcharge ou surchauffe), sans doute au démarrage du moteur. Elle se rallume d'elle-même après 5 secondes, et Home Assistant l'a rallumée.
+              Le Shelly de la pompe a coupé sur une protection (surintensité, surcharge ou surchauffe), sans doute au démarrage du moteur. Il se rallume de lui-même après 5 secondes, et Home Assistant l'a rallumé.
             {% else %}
-              La prise de la pompe a été éteinte : elle se rallume d'elle-même après 5 secondes. Pour intervenir sur la pompe, débranchez-la.
+              Le Shelly de la pompe a été éteint : il se rallume de lui-même après 5 secondes. Pour intervenir sur la pompe, débranchez-la.
             {% endif %}
 
   - id: water_heater_missed_heating
