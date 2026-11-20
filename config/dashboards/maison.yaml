@@ -309,18 +309,22 @@ views:
                     entity: sensor.prise_radiateur_puissance
                     above: 5
                 elements:
-                  - type: state-icon
-                    entity: sensor.prise_radiateur_puissance
-                    icon: mdi:radiator
-                    style:
-                      top: 40.2%
-                      left: 29.5%
-                      color: var(--state-climate-heat-color)
                   - type: state-label
                     entity: sensor.prise_radiateur_puissance
                     style:
                       top: 40.2%
                       left: 35.8%
+              - type: state-icon
+                entity: switch.prise_radiateur
+                icon: mdi:radiator
+                title: Radiateur d'appoint (toucher pour allumer ou éteindre)
+                tap_action:
+                  action: toggle
+                hold_action:
+                  action: more-info
+                style:
+                  top: 40.2%
+                  left: 29.5%
               - type: state-label
                 entity: sensor.prise_cellier_puissance
                 style:
