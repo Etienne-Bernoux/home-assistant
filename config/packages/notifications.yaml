@@ -124,6 +124,31 @@ automation:
               La prise du congélateur et du petit frigo ne répond plus depuis 10 minutes : coupure de courant ou disjoncteur.
             {% endif %}
 
+  - id: kitchen_fridge_plug_off
+    alias: Alerter si la prise du frigo de la cuisine est coupée
+    mode: single
+    triggers:
+      - trigger: state
+        entity_id: switch.prise_frigo
+        to: "off"
+        for: "00:01:00"
+        id: switched_off
+      - trigger: state
+        entity_id: switch.prise_frigo
+        to: unavailable
+        for: "00:10:00"
+        id: unreachable
+    actions:
+      - action: notify.mobile_app_pixel_6
+        data:
+          title: Frigo de la cuisine
+          message: >
+            {% if trigger.id == 'switched_off' %}
+              La prise du frigo de la cuisine est coupée. Rallumez-la depuis Home Assistant.
+            {% else %}
+              La prise du frigo de la cuisine ne répond plus depuis 10 minutes : coupure de courant ou disjoncteur.
+            {% endif %}
+
   - id: pump_plug_off
     alias: Rallumer la prise de la pompe après une coupure de protection
     mode: queued
@@ -133,6 +158,11 @@ automation:
         from: "on"
         to: "off"
         id: switched_off
+      - trigger: state
+        entity_id: switch.prise_pompe
+        to: "off"
+        for: "00:01:00"
+        id: still_off
       - trigger: state
         entity_id: switch.prise_pompe
         to: unavailable
@@ -157,10 +187,12 @@ automation:
           message: >
             {% if trigger.id == 'unreachable' %}
               La prise de la pompe ne répond plus depuis 10 minutes : coupure de courant ou disjoncteur. Sans elle, la maison n'a plus d'eau.
+            {% elif trigger.id == 'still_off' %}
+              La prise de la pompe reste éteinte depuis 1 minute : la maison n'a plus d'eau. Rallumez-la depuis Home Assistant.
             {% elif protection %}
-              La prise de la pompe a coupé sur une protection (surintensité, surcharge ou surchauffe), sans doute au démarrage du moteur. Home Assistant l'a rallumée.
+              La prise de la pompe a coupé sur une protection (surintensité, surcharge ou surchauffe), sans doute au démarrage du moteur. Elle se rallume d'elle-même après 5 secondes, et Home Assistant l'a rallumée.
             {% else %}
-              La prise de la pompe est éteinte : la maison n'a plus d'eau. Rallumez-la depuis Home Assistant.
+              La prise de la pompe a été éteinte : elle se rallume d'elle-même après 5 secondes. Pour intervenir sur la pompe, débranchez-la.
             {% endif %}
 
   - id: water_heater_missed_heating
@@ -281,3 +313,27 @@ automation:
           title: Sonnette
           message: Quelqu'un sonne à la porte d'entrée.
       - delay: "00:00:30"
+
+  - id: doorbell_history_fallback
+    alias: Prévenir le téléphone d'un coup de sonnette vu dans l'historique Ring
+    mode: single
+    triggers:
+      - trigger: state
+        entity_id: sensor.porte_d_entree_derniere_activite
+    conditions:
+      - condition: template
+        value_template: >
+          {% set ding = trigger.to_state.state | as_datetime(none) %}
+          {% set never = as_datetime('1970-01-01T00:00:00+00:00') %}
+          {% set pushed = state_attr('automation.prevenir_le_telephone_quand_on_sonne', 'last_triggered') or never %}
+          {{ trigger.to_state.attributes.category == 'ding'
+             and ding is not none
+             and now() - ding < timedelta(minutes=5)
+             and ding > (this.attributes.last_triggered or never)
+             and pushed < ding - timedelta(seconds=60) }}
+    actions:
+      - action: notify.mobile_app_pixel_6
+        data:
+          title: Sonnette
+          message: >
+            Quelqu'un a sonné à la porte d'entrée à {{ (trigger.to_state.state | as_datetime | as_local).strftime('%H:%M') }}.
