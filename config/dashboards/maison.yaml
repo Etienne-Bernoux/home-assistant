@@ -43,6 +43,11 @@ views:
                 style:
                   top: 65.1%
                   left: 43%
+              - type: state-label
+                entity: sensor.prise_lave_linge_puissance
+                style:
+                  top: 74%
+                  left: 82.9%
               - type: conditional
                 conditions:
                   - entity: vacuum.qrevo_s_pro_series
