@@ -39,6 +39,11 @@ views:
                   top: 50%
                   left: 50%
               - type: state-label
+                entity: sensor.prise_frigo_puissance
+                style:
+                  top: 50.3%
+                  left: 30.3%
+              - type: state-label
                 entity: sensor.prise_lave_vaisselle_puissance
                 style:
                   top: 65.1%
