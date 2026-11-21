@@ -1,12 +1,95 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="540 200 1020 980">
-<polygon id="jardin" points="556,277 1117,227 1300,224 1300,365 1383,447 1531,1102 665,1163" fill="#d3e6bd" stroke="#a9c48f" stroke-width="3"/>
-<polygon id="allee" points="1013,237 1062,233 1022,885 1078,1134 1018,1138 965,890" fill="#cbc4bc"/>
-<rect id="bassin" x="935" y="467" width="38" height="38" rx="4" fill="#9cc3dd" stroke="#6f9cbb" stroke-width="2"/>
-<polygon id="maison" points="1117,224 1300,224 1300,499 1324,499 1324,634 1082,634 1082,508 1060,508 1060,413 1117,413" fill="#3b3b3b"/>
-<g fill="#2e6b5f" font-family="Helvetica, Arial, sans-serif" font-size="30" font-weight="600" text-anchor="middle" dominant-baseline="middle">
-<text x="790" y="720">Jardin</text>
-<text x="1290" y="860">Jardin</text>
-<text x="954" y="535" font-size="22">Bassin</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="710 200 850 970">
+<rect x="710" y="200" width="850" height="970" fill="#e8e4dc"/>
+<defs>
+<clipPath id="limite-parcelle"><polygon points="737.9,277 1117,227 1300,224 1300,365 1383,447 1531,1094.37 1495.6,1093.3 1300.8,1087.4 1090,1081.02 1044,1079.62 803,1072.32 751.7,446.7 748.7,409.9"/></clipPath>
+<clipPath id="roof-edge"><polygon points="1117,224 1300,224 1300,499 1324,499 1324,634 1082,634 1082,508 1060,508 1060,413 1117,413"/></clipPath>
+<g id="tree">
+<circle r="22" fill="#adc398" stroke="#789369" stroke-width="2"/>
+<circle cx="-6" cy="-5" r="11" fill="#bfd1ad"/>
 </g>
-<text x="1205" y="430" fill="#ffffff" font-family="Helvetica, Arial, sans-serif" font-size="30" font-weight="600" text-anchor="middle" dominant-baseline="middle">Maison</text>
+</defs>
+<g id="abords" transform="matrix(1.29411765 0 0.13731795 1.18649518 562.34386230 74.14469453)">
+<path d="M0 110Q40 118 103 105L109 275 114 522 112 690 123 832Q161 838 277 845L288 902H0Z" fill="#d1d5c1"/>
+<path d="M652 269L746 298V894H641L632 842 657 765 643 715 671 624 659 554 683 474Z" fill="#d6d7c5"/>
+<path d="M0 81Q41 100 89 92T216 81Q260 77 282 94" fill="none" stroke="#c5b79e" stroke-width="24"/>
+<path d="M0 81Q41 100 89 92T216 81Q260 77 282 94" fill="none" stroke="#ded3bf" stroke-width="16"/>
+<path d="M101 122Q103 250 111 381T112 654Q110 751 122 829L273 844" fill="none" stroke="#9da78d" stroke-width="5" opacity=".65"/>
+<g fill="#b5bda6" stroke="#a5af97" stroke-width="1.3">
+<path d="M6 188Q18 180 32 195L47 212 41 226 48 244 22 258 7 247Z"/>
+<path d="M2 367Q22 356 40 375L39 389 58 404 45 422 18 418 3 403Z"/>
+<path d="M18 433Q36 416 60 428L72 449 64 464 73 479 52 495 29 485 27 467 12 456Z"/>
+<path d="M41 484Q61 479 79 495L88 516 73 534 54 529 42 516 29 507Z"/>
+<path d="M38 562Q60 541 79 556L91 577 77 595 53 590 44 606 26 594Z"/>
+<path d="M30 627Q44 617 57 633L66 651 56 672 40 680 19 665 18 647Z"/>
+<path d="M24 729Q46 715 68 734L76 753 65 776 39 778 23 764 7 747Z"/>
+<path d="M667 365Q686 348 707 359L715 378 735 390 724 409 700 408 687 423 664 411 660 388Z"/>
+<path d="M663 438Q687 423 707 438L716 467 709 486 682 489 666 477 652 456Z"/>
+<path d="M667 644Q682 627 703 633L715 646 736 662 730 682 704 681 697 707 679 692 671 670 655 662Z"/>
+<path d="M642 708Q655 698 673 714L681 736 671 757 650 755 635 735Z"/>
+</g>
+</g>
+<g id="toiture-mitoyenne" stroke="#a89682" stroke-width="1.5" stroke-linejoin="round">
+<path d="M1300 224H1432V376H1300Z" fill="#d5c5b3"/>
+<path d="M1366 224H1432V376H1366Z" fill="#c6b5a1"/>
+<path d="M1366 224V376" fill="none" stroke="#9c8978"/>
+</g>
+<path id="allee-exterieure" d="M1067 1078 C1068 1108 1074 1145 1084 1180" fill="none" stroke="#d9cebc" stroke-width="46" stroke-linecap="butt"/>
+<g clip-path="url(#limite-parcelle)">
+<polygon id="jardin" points="737.9,277 1117,227 1300,224 1300,365 1383,447 1531,1094.37 1495.6,1093.3 1300.8,1087.4 1090,1081.02 1044,1079.62 803,1072.32 751.7,446.7 748.7,409.9" fill="#e4ead8" stroke="#849574" stroke-width="3"/>
+<path id="allee" d="M1067 1083 C1065 1000 1058 930 1045 868 C1034 815 1029 744 1029 674 L1029 258" fill="none" stroke="#d9cebc" stroke-width="46" stroke-linecap="butt" stroke-linejoin="round"/>
+<use href="#tree" transform="translate(925 567) scale(0.9)"/>
+<use href="#tree" transform="translate(1316 689) scale(1.15)"/>
+<use href="#tree" transform="translate(1137 744) scale(0.75)"/>
+<use href="#tree" transform="translate(1165 794) scale(1.2)"/>
+<use href="#tree" transform="translate(1189 887) scale(1.05)"/>
+<use href="#tree" transform="translate(1325 918) scale(1.1)"/>
+<use href="#tree" transform="translate(1123 987) scale(0.9)"/>
+<use href="#tree" transform="translate(1283 1040) scale(1.2)"/>
+<use href="#tree" transform="translate(1417 1021) scale(1)"/>
+<use href="#tree" transform="translate(925 1021) scale(0.95)"/>
+<rect id="bassin" x="935" y="467" width="38" height="38" rx="4" fill="#b4d4df" stroke="#557a8c" stroke-width="2"/>
+<polygon id="maison" points="1117,224 1300,224 1300,499 1324,499 1324,634 1082,634 1082,508 1060,508 1060,413 1117,413" fill="#ddc6af"/>
+<g clip-path="url(#roof-edge)">
+<path d="M1210 224H1300V499H1210ZM1100 413H1130V508H1100ZM1210 499H1324V634H1210Z" fill="#c5aa90"/>
+<path d="M1210 224V634 M1100 413V508" fill="none" stroke="#8b786a" stroke-width="2"/>
+<path d="M1130 413V508" fill="none" stroke="#a9907d" stroke-width="2"/>
+<g id="panneaux" fill="#546671" stroke="#d2dde2" stroke-width="1.5">
+<polygon points="1145.3,325.7 1171.8,330.4 1171.3,393.3 1143.4,387.4"/>
+<polygon points="1178.4,331.6 1210.1,337.5 1209.2,396.9 1177.5,390.9"/>
+<polygon points="1190.8,427.7 1219.8,432.5 1217.9,471.6 1188.9,466.9"/>
+<polygon points="1141.6,506.0 1218.8,513.1 1219.6,598.6 1141.0,590.3"/>
+</g>
+</g>
+<polygon points="1117,224 1300,224 1300,499 1324,499 1324,634 1082,634 1082,508 1060,508 1060,413 1117,413" fill="none" stroke="#655751" stroke-width="3" stroke-linejoin="round"/>
+<g id="parking">
+<rect x="1040" y="730" width="114" height="112" fill="#e2d8c3" stroke="#78634f" stroke-width="2"/>
+</g>
+<g id="abri-bois">
+<polygon points="1364.2,718.4 1411.4,712.5 1440.4,806.2 1388.4,815.7" fill="#c5b094" stroke="#78634f" stroke-width="2" stroke-linejoin="round"/>
+</g>
+<polygon id="cabane-enfants" points="1286.3,973.5 1327.3,969.9 1330.0,1016.0 1291.0,1018.0" fill="#ddc4a5" stroke="#78634f" stroke-width="2" stroke-linejoin="round"/>
+<polygon id="poulailler" points="1295.8,1030.8 1487.2,1043.5 1495.6,1093.3 1300.8,1087.4" fill="#c5b094" stroke="#78634f" stroke-width="2" stroke-linejoin="round"/>
+<g id="cabane-outils">
+<polygon points="748.7,409.9 776.0,411.1 780.0,445.5 751.7,446.7" fill="#c5b094" stroke="#78634f" stroke-width="2" stroke-linejoin="round"/>
+</g>
+<g id="grillage" fill="none" stroke="#52614d" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+<path d="M1044 1079.62L803 1072.32L751.7 446.7 M748.7 409.9L737.9 277L1117 227 M1300 365L1383 447L1490 924 M1499 965L1531 1094.37L1495.6 1093.3 M1300.8 1087.4L1090 1081.02"/>
+</g>
+<g id="portail" fill="none" stroke="#655751" stroke-width="4" stroke-linecap="round">
+<path d="M1044 1079.62L1090 1081.02" stroke-dasharray="7 4"/>
+<path d="M1044 1073.62V1085.62 M1090 1075.02V1087.02"/>
+</g>
+<g fill="#344238" font-family="Helvetica, Arial, sans-serif" font-size="30" font-weight="600" text-anchor="middle" dominant-baseline="middle">
+<text x="863" y="720">Jardin</text>
+<text x="1364" y="652" font-size="23" paint-order="stroke" stroke="#fff" stroke-width="4">Abri à bois</text>
+<text x="1097" y="786" font-size="23" paint-order="stroke" stroke="#fff" stroke-width="4">Parking</text>
+<text x="1405" y="1065" font-size="23" paint-order="stroke" stroke="#fff" stroke-width="4">Poulailler</text>
+<text x="1305" y="942" font-size="23" paint-order="stroke" stroke="#fff" stroke-width="4">Cabane des enfants</text>
+<text x="946" y="435" font-size="22">Bassin</text>
+<text x="965" y="908" font-size="23">Allée</text>
+<text x="1067" y="1047" font-size="23">Portail</text>
+<text x="851" y="457" font-size="23">Cabane à outils</text>
+</g>
+<text x="1244" y="418" fill="#302823" font-family="Helvetica, Arial, sans-serif" font-size="30" font-weight="600" text-anchor="middle" dominant-baseline="middle">Maison</text>
+</g>
 </svg>

@@ -9,10 +9,10 @@ views:
       - type: grid
         cards:
           - type: picture-elements
-            image: /local/plan-etage.svg?v=3
+            image: /local/plan-etage.svg?v=4
             elements:
               - type: custom:plan-heatmap
-                plan: /local/plan-etage.svg?v=3
+                plan: /local/plan-etage.svg?v=4
                 rooms:
                   cuisine: sensor.temperature_cuisine
                   salon: sensor.echo_dot_salon_temperature
@@ -271,10 +271,10 @@ views:
       - type: grid
         cards:
           - type: picture-elements
-            image: /local/plan-rdc.svg?v=3
+            image: /local/plan-rdc.svg?v=4
             elements:
               - type: custom:plan-heatmap
-                plan: /local/plan-rdc.svg?v=3
+                plan: /local/plan-rdc.svg?v=4
                 rooms:
                   bureau_rdc: sensor.echo_bureau_temperature
                 style:
@@ -412,7 +412,7 @@ views:
       - type: grid
         cards:
           - type: picture-elements
-            image: /local/plan-terrain.svg?v=1
+            image: /local/plan-terrain.svg?v=20
             elements:
               - type: icon
                 icon: mdi:home-search
@@ -421,19 +421,19 @@ views:
                   action: navigate
                   navigation_path: /dashboard-maison/rez-de-chaussee
                 style:
-                  top: 31.5%
-                  left: 65%
+                  top: 28.4%
+                  left: 64.8%
               - type: state-icon
                 entity: light.portail_lumiere
                 style:
-                  top: 88.3%
-                  left: 49.6%
+                  top: 95.4%
+                  left: 34.1%
               - type: state-icon
                 entity: camera.portail_vue_en_direct
                 icon: mdi:cctv
                 style:
-                  top: 92.3%
-                  left: 49.6%
+                  top: 95.4%
+                  left: 49.9%
   - title: Températures
     path: temperatures
     icon: mdi:thermometer
