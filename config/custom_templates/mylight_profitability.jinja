@@ -1,0 +1,20 @@
+{% macro energy_delta_kwh(current, previous, same_day) -%}
+  {%- set current = current | float(none) -%}
+  {%- set previous = previous | float(0) if same_day else 0 -%}
+  {%- set delta = 0 if current is none else (current - previous if current >= previous else (current if current < previous * 0.5 else 0)) -%}
+  {{- delta / 1000 -}}
+{%- endmacro %}
+
+{% macro mylight_energy_cost(previous, bought, reinjected, price) -%}
+  {{- (previous + bought * price - reinjected * 0.042) | round(4) -}}
+{%- endmacro %}
+
+{% macro edf_with_panels_cost(previous, bought, returned, off_peak) -%}
+  {%- set rate = 0.1589 if off_peak else 0.2142 -%}
+  {{- (previous + (bought + returned) * rate) | round(4) -}}
+{%- endmacro %}
+
+{% macro edf_without_panels_cost(previous, bought, returned, green, off_peak) -%}
+  {%- set rate = 0.1589 if off_peak else 0.2142 -%}
+  {{- (previous + (bought + returned + green) * rate) | round(4) -}}
+{%- endmacro %}

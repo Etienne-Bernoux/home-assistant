@@ -70,7 +70,9 @@ npm test --prefix tests -- --tags "not @nyons"
 HA_URL=http://192.168.1.250 HA_TOKEN="$(security find-generic-password -s ha-nyons -w)" npm test --prefix tests
 ```
 
-Pour ajouter un scénario, décrire un résultat observable dans le fichier `.feature` du domaine et faire exécuter la règle existante par les étapes de test. Les scénarios météo, heures creuses et protection de l’annexe évaluent du Jinja via `/api/template` avec des entrées simulées. Les automatisations qui pilotent un appareil ou envoient une notification nécessitent des entrées et des actions simulées pour pouvoir tester leurs déclencheurs, conditions et effets sans intervenir sur la maison.
+Pour ajouter un scénario, décrire un résultat observable dans le fichier `.feature` du domaine et faire exécuter la règle existante par les étapes de test. Les scénarios météo, heures creuses, protection de l’annexe et coûts de rentabilité évaluent du Jinja via `/api/template` avec des entrées simulées. Les automatisations qui pilotent un appareil ou envoient une notification nécessitent des entrées et des actions simulées pour pouvoir tester leurs déclencheurs, conditions et effets sans intervenir sur la maison.
+
+Les trois coûts d’énergie de la page Rentabilité et la conversion des index en kWh sont définis dans [`mylight_profitability.jinja`](config/custom_templates/mylight_profitability.jinja). Le [package de rentabilité](config/packages/mylight_profitability.yaml) fournit les relevés, les tarifs et le cumul précédent. Les [scénarios Gherkin](tests/features/profitability/costs.feature) comparent les résultats en euros sur des relevés simulés.
 
 ## Rattraper une panne
 
