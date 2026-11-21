@@ -426,14 +426,14 @@ views:
               - type: state-icon
                 entity: light.portail_lumiere
                 style:
-                  top: 95.4%
-                  left: 34.1%
+                  top: 87.3%
+                  left: 30.6%
               - type: state-icon
                 entity: camera.portail_vue_en_direct
                 icon: mdi:cctv
                 style:
-                  top: 95.4%
-                  left: 49.9%
+                  top: 87.3%
+                  left: 53.5%
   - title: Températures
     path: temperatures
     icon: mdi:thermometer
