@@ -1,0 +1,147 @@
+automation:
+  - id: alexa_temperatures_reload
+    alias: Recharger l'intégration Alexa quand les températures des Echo tombent
+    mode: single
+    triggers:
+      - trigger: template
+        value_template: >
+          {{ ['sensor.echo_bureau_temperature', 'sensor.echo_dot_salon_temperature', 'sensor.echo_dot_cuisine_temperature']
+             | map('states') | reject('in', ['unavailable', 'unknown']) | list | count == 0 }}
+        for: "00:15:00"
+    actions:
+      - action: homeassistant.reload_config_entry
+        target:
+          entity_id: sensor.echo_bureau_temperature
+      - wait_template: "{{ states('sensor.echo_bureau_temperature') | is_number }}"
+        timeout: "00:02:00"
+      - action: notify.mobile_app_pixel_6
+        data:
+          title: Températures des Echo
+          message: >
+            {% if wait.completed %}
+              Les trois Echo ne donnaient plus leur température depuis 15 minutes : l'intégration Alexa a été rechargée, elles sont revenues.
+            {% else %}
+              Les trois Echo ne donnent plus leur température depuis 15 minutes, et recharger l'intégration Alexa n'a pas suffi.
+            {% endif %}
+
+  - id: cellar_plug_off
+    alias: Alerter si la prise du congélateur est coupée
+    mode: single
+    triggers:
+      - trigger: state
+        entity_id: switch.prise_cellier
+        to: "off"
+        for: "00:01:00"
+        id: switched_off
+      - trigger: state
+        entity_id: switch.prise_cellier
+        to: unavailable
+        for: "00:10:00"
+        id: unreachable
+    actions:
+      - action: notify.mobile_app_pixel_6
+        data:
+          title: Congélateur du cellier
+          message: >
+            {% if trigger.id == 'switched_off' %}
+              La prise du congélateur et du petit frigo est coupée. Rallumez-la depuis Home Assistant.
+            {% else %}
+              La prise du congélateur et du petit frigo ne répond plus depuis 10 minutes : coupure de courant ou disjoncteur.
+            {% endif %}
+
+  - id: kitchen_fridge_plug_off
+    alias: Alerter si la prise du frigo de la cuisine est coupée
+    mode: single
+    triggers:
+      - trigger: state
+        entity_id: switch.prise_frigo
+        to: "off"
+        for: "00:01:00"
+        id: switched_off
+      - trigger: state
+        entity_id: switch.prise_frigo
+        to: unavailable
+        for: "00:10:00"
+        id: unreachable
+    actions:
+      - action: notify.mobile_app_pixel_6
+        data:
+          title: Frigo de la cuisine
+          message: >
+            {% if trigger.id == 'switched_off' %}
+              La prise du frigo de la cuisine est coupée. Rallumez-la depuis Home Assistant.
+            {% else %}
+              La prise du frigo de la cuisine ne répond plus depuis 10 minutes : coupure de courant ou disjoncteur.
+            {% endif %}
+
+  - id: pump_plug_off
+    alias: Rallumer la prise de la pompe après une coupure de protection
+    mode: queued
+    triggers:
+      - trigger: state
+        entity_id: switch.prise_pompe
+        from: "on"
+        to: "off"
+        id: switched_off
+      - trigger: state
+        entity_id: switch.prise_pompe
+        to: "off"
+        for: "00:01:00"
+        id: still_off
+      - trigger: state
+        entity_id: switch.prise_pompe
+        to: unavailable
+        for: "00:10:00"
+        id: unreachable
+    variables:
+      protection: >
+        {{ is_state('binary_sensor.prise_pompe_surintensite', 'on')
+           or is_state('binary_sensor.prise_pompe_surcharge', 'on')
+           or is_state('binary_sensor.prise_pompe_surchauffe', 'on') }}
+    actions:
+      - if:
+          - condition: template
+            value_template: "{{ trigger.id == 'switched_off' and protection }}"
+        then:
+          - action: switch.turn_on
+            target:
+              entity_id: switch.prise_pompe
+      - action: notify.mobile_app_pixel_6
+        data:
+          title: Pompe
+          message: >
+            {% if trigger.id == 'unreachable' %}
+              Le Shelly de la pompe ne répond plus depuis 10 minutes : coupure de courant ou disjoncteur. Sans lui, la maison n'a plus d'eau.
+            {% elif trigger.id == 'still_off' %}
+              Le Shelly de la pompe reste éteint depuis 1 minute : la maison n'a plus d'eau. Rallumez-le depuis Home Assistant.
+            {% elif protection %}
+              Le Shelly de la pompe a coupé sur une protection (surintensité, surcharge ou surchauffe), sans doute au démarrage du moteur. Il se rallume de lui-même après 5 secondes, et Home Assistant l'a rallumé.
+            {% else %}
+              Le Shelly de la pompe a été éteint : il se rallume de lui-même après 5 secondes. Pour intervenir sur la pompe, débranchez-la.
+            {% endif %}
+
+  - id: yoto_charge_reminder
+    alias: Rappeler de recharger les Yoto avant la nuit
+    mode: single
+    triggers:
+      - trigger: time
+        at: "18:30:00"
+    variables:
+      low: >
+        {% set ns = namespace(names=[]) %}
+        {% for name, slug in [('Aimée', 'aimee'), ('Ambroise', 'ambroise')] %}
+          {% set level = states('sensor.yoto_' ~ slug ~ '_batterie') | float(100) %}
+          {% if level < 20 and is_state('binary_sensor.yoto_' ~ slug ~ '_en_charge', 'off') %}
+            {% set ns.names = ns.names + ["le Yoto d'" ~ name ~ ", à " ~ level | int ~ " pour cent"] %}
+          {% endif %}
+        {% endfor %}
+        {{ ns.names }}
+    conditions:
+      - condition: template
+        value_template: "{{ low | count > 0 }}"
+    actions:
+      - action: notify.send_message
+        target:
+          entity_id: notify.partout_annoncer
+        data:
+          message: "Pensez à mettre en charge {{ low | join(', et ') }}."

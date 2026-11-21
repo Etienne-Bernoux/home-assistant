@@ -8,7 +8,9 @@ Configuration versionnée d'un Home Assistant domestique (Raspberry Pi 4, Home A
 |---|---|
 | `config/packages/energy_tariff.yaml` | Plages d'heures creuses et prix du kWh en vigueur |
 | `config/packages/mylight_profitability.yaml` | Gain de la batterie virtuelle face à EDF Tarif Bleu, économie de l'installation, dates de retour sur investissement, état de charge de la batterie virtuelle, et puissances de la batterie virtuelle et du réseau facturé, qui partagent la puissance nette mesurée par l'Envoy selon le stock, et les mêmes cumuls, dates et montants annuels avec l'annexe refacturée : sa majoration, écart entre le prix heures pleines qu'elle doit et le Tarif Bleu heures pleines, sur ses kWh relevés au sous-compteur puis mesurés par le Shelly |
-| `config/packages/notifications.yaml` | Alertes push : sources de données muettes, intégration Alexa rechargée seule quand les trois Echo ne donnent plus leur température depuis 15 minutes, sauvegarde manquante, redémarrage, sonnette, annexe au-dessus de son seuil réglable (18 A conseillé) pendant 15 minutes sur sa ligne de 20 A, prise du congélateur du cellier coupée ou muette, prise du frigo de la cuisine coupée ou muette, Shelly 1PM de la pompe coupé, resté éteint une minute ou muet (il se rallume de lui-même 5 secondes après toute coupure, `auto_on` réglé dans le Shelly, et Home Assistant le rallume aussi après une protection, surintensité, surcharge ou surchauffe, au démarrage du moteur), coup de sonnette repéré dans l'historique Ring quand l'événement en direct n'est pas arrivé (secours tant que la bibliothèque de notifications push de Ring plante sur certains messages), chauffe-eau pas chauffé la nuit ou à midi ou sans atteindre sa consigne depuis 7 jours (contrôle à 8 h), micro-onduleur sous la moitié de la production médiane du jour (contrôle 30 minutes avant le coucher du soleil), et annonce sur les Echo à 18 h 30 des Yoto des enfants sous 20 % et pas en charge |
+| `config/packages/infrastructure.yaml` | Disponibilité des sources, sauvegardes et démarrage de Home Assistant |
+| `config/packages/devices.yaml` | Echo, prises du frigo et du congélateur, pompe, Yoto |
+| `config/packages/doorbell.yaml` | Sonnette et secours via l’historique Ring |
 | `config/packages/solar.yaml` | Ensoleillement reçu à la maison, cumulé heure par heure depuis le rayonnement Open-Meteo, comparé à la production dans l'onglet Solaire |
 | `config/packages/water_heater.yaml` | Chauffe-eau en chauffe au-dessus de 100 W, d'après la puissance mesurée par MyLight, pour colorer son icône sur le plan du rez-de-chaussée, chauffe-eau pas chauffé si le relais MyLight ne s'est pas fermé entre minuit et 7 h 30 ou entre 7 h et 15 h 45, icône alors rouge, chauffe avancée à 1 h et 11 h 30 quand le ballon chauffait encore à la fin de la plage précédente (résistance à moitié hors service), et dernière fois à température : heure où le thermostat a coupé, relais fermé, après au moins 10 minutes de chauffe |
 | `config/packages/annex.yaml` | Coût de l'annexe : chaque kWh mesuré par le Shelly EM de sa ligne compté au prix heures pleines en vigueur, ce prix exposé en capteur, seuil d'alerte de courant réglable, et coupure automatique de l'annexe au-delà d'une puissance réglable pendant 30 s, remise seule après 1, 1, 3, 5 et 10 minutes puis à la main, chaque coupure notifiée, comme une coupure manuelle ou une annexe sans courant pendant 2 minutes (disjoncteur, contacteur) |
@@ -56,11 +58,11 @@ HA_URL=http://192.168.1.250 HA_TOKEN=… node scripts/test-weather-advice.mjs
 |---|---|
 | Solaire, batterie virtuelle et tarifs | `config/packages/solar.yaml`, `mylight_profitability.yaml`, `energy_tariff.yaml` et les macros MyLight de `config/custom_templates/` |
 | Météo et rappels de pluie | `config/packages/weather_advice.yaml` et `config/custom_templates/weather_advice.jinja` |
-| Température et chauffe-eau | `config/packages/temperature.yaml`, `water_heater.yaml` et `notifications.yaml` |
-| Annexe et protections électriques | `config/packages/annex.yaml` et `notifications.yaml` |
-| Appareils, alertes et musique | `config/packages/notifications.yaml` et `music.yaml` |
+| Température et chauffe-eau | `config/packages/temperature.yaml` et `water_heater.yaml` |
+| Annexe et protections électriques | `config/packages/annex.yaml` |
+| Appareils, sonnette, infrastructure et musique | `config/packages/devices.yaml`, `doorbell.yaml`, `infrastructure.yaml` et `music.yaml` |
 
-Les scénarios Gherkin sont rangés par domaine dans `tests/`. Les deux scénarios Énergie contrôlent sur Nyons les statistiques solaires du 20 novembre 2026 et les sources du tableau. Ils lisent Home Assistant sans déclencher d’automatisation ni écrire de statistiques. GitHub Actions exécute les scénarios hors ligne à chaque push et pull request. Les scénarios marqués `@nyons` s’exécutent depuis un poste qui peut joindre Home Assistant.
+Le [catalogue des automatisations](docs/automations.md) relie chaque règle à son package et à son identifiant Home Assistant. Les scénarios Gherkin sont rangés par domaine dans `tests/features/`. Les deux scénarios Énergie contrôlent sur Nyons les statistiques solaires du 20 novembre 2026 et les sources du tableau. Ils lisent Home Assistant sans déclencher d’automatisation ni écrire de statistiques. GitHub Actions exécute les scénarios hors ligne à chaque push et pull request. Les scénarios marqués `@nyons` s’exécutent depuis un poste qui peut joindre Home Assistant.
 
 ```bash
 npm ci --prefix tests
@@ -68,7 +70,7 @@ npm test --prefix tests -- --tags "not @nyons"
 HA_URL=http://192.168.1.250 HA_TOKEN="$(security find-generic-password -s ha-nyons -w)" npm test --prefix tests
 ```
 
-Pour ajouter un scénario, décrire un résultat observable dans le fichier `.feature` du domaine et faire exécuter la règle existante par les étapes de test. Les calculs météo ont déjà un test via `/api/template` avec des prévisions fabriquées. Les automatisations qui pilotent un appareil ou envoient une notification nécessitent des entrées et des actions simulées pour pouvoir tester leurs déclencheurs, conditions et effets sans intervenir sur la maison.
+Pour ajouter un scénario, décrire un résultat observable dans le fichier `.feature` du domaine et faire exécuter la règle existante par les étapes de test. Les scénarios météo, heures creuses et protection de l’annexe évaluent du Jinja via `/api/template` avec des entrées simulées. Les automatisations qui pilotent un appareil ou envoient une notification nécessitent des entrées et des actions simulées pour pouvoir tester leurs déclencheurs, conditions et effets sans intervenir sur la maison.
 
 ## Rattraper une panne
 

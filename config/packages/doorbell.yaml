@@ -1,0 +1,44 @@
+automation:
+  - id: doorbell_announce
+    alias: Prévenir le téléphone quand on sonne
+    mode: single
+    max_exceeded: silent
+    triggers:
+      - trigger: state
+        entity_id: event.porte_d_entree_sonnerie
+    conditions:
+      - condition: template
+        value_template: >
+          {{ trigger.to_state.attributes.event_type == 'ring'
+             and trigger.to_state.state | as_datetime is not none
+             and now() - (trigger.to_state.state | as_datetime) < timedelta(seconds=30) }}
+    actions:
+      - action: notify.mobile_app_pixel_6
+        data:
+          title: Sonnette
+          message: Quelqu'un sonne à la porte d'entrée.
+      - delay: "00:00:30"
+
+  - id: doorbell_history_fallback
+    alias: Prévenir le téléphone d'un coup de sonnette vu dans l'historique Ring
+    mode: single
+    triggers:
+      - trigger: state
+        entity_id: sensor.porte_d_entree_derniere_activite
+    conditions:
+      - condition: template
+        value_template: >
+          {% set ding = trigger.to_state.state | as_datetime(none) %}
+          {% set never = as_datetime('1970-01-01T00:00:00+00:00') %}
+          {% set pushed = state_attr('automation.prevenir_le_telephone_quand_on_sonne', 'last_triggered') or never %}
+          {{ trigger.to_state.attributes.category == 'ding'
+             and ding is not none
+             and now() - ding < timedelta(minutes=5)
+             and ding > (this.attributes.last_triggered or never)
+             and pushed < ding - timedelta(seconds=60) }}
+    actions:
+      - action: notify.mobile_app_pixel_6
+        data:
+          title: Sonnette
+          message: >
+            Quelqu'un a sonné à la porte d'entrée à {{ (trigger.to_state.state | as_datetime | as_local).strftime('%H:%M') }}.

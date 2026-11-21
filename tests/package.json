@@ -6,6 +6,7 @@
     "test": "cucumber-js --import 'features/**/*.steps.mjs' 'features/**/*.feature'"
   },
   "devDependencies": {
-    "@cucumber/cucumber": "13.3.0"
+    "@cucumber/cucumber": "13.3.0",
+    "yaml": "2.9.1"
   }
 }

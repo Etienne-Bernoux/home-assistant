@@ -117,6 +117,23 @@ automation:
         target:
           entity_id: counter.annexe_coupures
 
+  - id: annex_line_overload
+    alias: Alerter si l'annexe tire près de la limite de sa ligne
+    mode: single
+    triggers:
+      - trigger: numeric_state
+        entity_id: sensor.annexe_courant
+        above: input_number.annexe_seuil_courant
+        for: "00:15:00"
+    actions:
+      - action: notify.mobile_app_pixel_6
+        data:
+          title: Annexe proche de la limite
+          message: >
+            L'annexe tire {{ states('sensor.annexe_courant') | float | round(1) }} A
+            depuis 15 minutes, au-dessus du seuil de {{ states('input_number.annexe_seuil_courant') | float }} A,
+            sur une ligne de 20 A. Évitez d'y lancer en plus le four ou une machine.
+
 template:
   - sensor:
       - name: Prix heures pleines

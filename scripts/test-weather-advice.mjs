@@ -1,12 +1,7 @@
 import assert from "node:assert/strict";
+import { pathToFileURL } from "node:url";
 
-const HA_URL = process.env.HA_URL;
-const HA_TOKEN = process.env.HA_TOKEN;
-
-if (!HA_URL || !HA_TOKEN) {
-  console.error("HA_URL and HA_TOKEN must be set");
-  process.exit(1);
-}
+import { render } from "./lib/home-assistant-template.mjs";
 
 const DAY = "2026-11-10";
 const NEXT = "2026-11-11";
@@ -26,17 +21,6 @@ function forecast(from, hours, overrides = {}) {
       ...overrides[key],
     };
   });
-}
-
-async function render(template) {
-  const response = await fetch(`${HA_URL}/api/template`, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${HA_TOKEN}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ template }),
-  });
-  const text = await response.text();
-  if (!response.ok) throw new Error(`${response.status} ${text}`);
-  return JSON.parse(text);
 }
 
 function evening(overrides) {
@@ -62,7 +46,7 @@ const wet = (...keys) => Object.fromEntries(keys.map((key) => [key, { precipitat
 const at = (day, hour) => `${day} ${String(hour).padStart(2, "0")}`;
 const memory = (hour) => `${DAY} ${String(hour).padStart(2, "0")}:00:00`;
 
-const cases = {
+export const cases = {
   "AE1 hot tomorrow, mild night: shutters only": async () => {
     const result = await evening({ [at(NEXT, 15)]: { temperature: 29 }, [at(NEXT, 4)]: { temperature: 12 } });
     assert.deepEqual(result, { consignes: ["volets"], max: 29 });
@@ -146,15 +130,17 @@ const cases = {
   },
 };
 
-let failed = 0;
-for (const [name, run] of Object.entries(cases)) {
-  try {
-    await run();
-    console.log(`ok   ${name}`);
-  } catch (error) {
-    failed += 1;
-    console.log(`FAIL ${name}\n     ${error.message.split("\n").join("\n     ")}`);
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  let failed = 0;
+  for (const [name, run] of Object.entries(cases)) {
+    try {
+      await run();
+      console.log(`ok   ${name}`);
+    } catch (error) {
+      failed += 1;
+      console.log(`FAIL ${name}\n     ${error.message.split("\n").join("\n     ")}`);
+    }
   }
+  console.log(`${Object.keys(cases).length - failed}/${Object.keys(cases).length} passed`);
+  process.exit(failed ? 1 : 0);
 }
-console.log(`${Object.keys(cases).length - failed}/${Object.keys(cases).length} passed`);
-process.exit(failed ? 1 : 0);

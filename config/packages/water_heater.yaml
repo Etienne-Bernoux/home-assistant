@@ -88,3 +88,45 @@ automation:
       - action: switch.turn_on
         target:
           entity_id: switch.chauffe_eau_relais
+
+  - id: water_heater_missed_heating
+    alias: Alerter si le chauffe-eau n'a pas chauffé pendant les heures creuses
+    mode: single
+    triggers:
+      - trigger: state
+        entity_id: binary_sensor.chauffe_eau_pas_chauffe
+        not_from: unavailable
+        to: "on"
+    actions:
+      - action: notify.mobile_app_pixel_6
+        data:
+          title: Chauffe-eau
+          message: >
+            {% if state_attr('binary_sensor.chauffe_eau_pas_chauffe', 'window') == 'night' %}
+              Le relais MyLight ne s'est pas fermé cette nuit entre 2 h et 7 h : l'eau n'a pas chauffé.
+            {% else %}
+              Le relais MyLight ne s'est pas fermé depuis 7 h, heures creuses de midi comprises : l'eau n'a pas chauffé.
+            {% endif %}
+            Vérifiez le mode du relais dans l'application MyLight.
+
+  - id: water_heater_not_full_for_a_week
+    alias: Alerter si le chauffe-eau n'a pas atteint sa consigne depuis 7 jours
+    mode: single
+    triggers:
+      - trigger: time
+        at: "08:00:00"
+    variables:
+      last: "{{ states('sensor.chauffe_eau_derniere_fois_a_temperature') }}"
+    conditions:
+      - condition: template
+        value_template: >
+          {% set t = last | as_datetime(none) %}
+          {{ t is not none and now() - t > timedelta(days=7) }}
+    actions:
+      - action: notify.mobile_app_pixel_6
+        data:
+          title: Chauffe-eau
+          message: >
+            Le ballon n'a pas atteint sa consigne de 60 °C depuis le {{ as_local(last | as_datetime).strftime('%d/%m') }} :
+            le thermostat ne coupe plus avant la fin des heures creuses. Contrôlez la résistance,
+            et faites une chauffe complète contre les légionelles.
