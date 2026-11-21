@@ -14,31 +14,40 @@ template:
         attributes:
           day: "{{ now().date() | string }}"
           last_bought: "{{ states('sensor.mylight_systems_consommation_reseau_sans_batterie_virtuelle') | float(this.attributes.get('last_bought', 0) | float(0)) }}"
+          last_bought_day: >-
+            {% from 'mylight_profitability.jinja' import reading_day %}
+            {{ reading_day(expand('sensor.mylight_systems_consommation_reseau_sans_batterie_virtuelle'), this.attributes.get('last_bought_day', this.attributes.get('day', ''))) }}
           last_returned: "{{ states('sensor.mylight_systems_decharge_batterie') | float(this.attributes.get('last_returned', 0) | float(0)) }}"
+          last_returned_day: >-
+            {% from 'mylight_profitability.jinja' import reading_day %}
+            {{ reading_day(expand('sensor.mylight_systems_decharge_batterie'), this.attributes.get('last_returned_day', this.attributes.get('day', ''))) }}
           last_green: "{{ states('sensor.mylight_systems_energie_verte_solaire_direct') | float(this.attributes.get('last_green', 0) | float(0)) }}"
+          last_green_day: >-
+            {% from 'mylight_profitability.jinja' import reading_day %}
+            {{ reading_day(expand('sensor.mylight_systems_energie_verte_solaire_direct'), this.attributes.get('last_green_day', this.attributes.get('day', ''))) }}
           last_reinjected: "{{ states('sensor.mylight_systems_energie_reinjectee_au_reseau') | float(this.attributes.get('last_reinjected', 0) | float(0)) }}"
+          last_reinjected_day: >-
+            {% from 'mylight_profitability.jinja' import reading_day %}
+            {{ reading_day(expand('sensor.mylight_systems_energie_reinjectee_au_reseau'), this.attributes.get('last_reinjected_day', this.attributes.get('day', ''))) }}
           ml_energy_eur: >
             {% from 'mylight.jinja' import baseline %}
-            {% from 'mylight_profitability.jinja' import energy_delta_kwh, mylight_energy_cost %}
-            {% set same_day = this.attributes.get('day') == now().date() | string %}
-            {% set bought = energy_delta_kwh(states('sensor.mylight_systems_consommation_reseau_sans_batterie_virtuelle'), this.attributes.get('last_bought', 0), same_day) | float %}
-            {% set reinjected = energy_delta_kwh(states('sensor.mylight_systems_energie_reinjectee_au_reseau'), this.attributes.get('last_reinjected', 0), same_day) | float %}
+            {% from 'mylight_profitability.jinja' import counter_delta_kwh, mylight_energy_cost %}
+            {% set bought = counter_delta_kwh(expand('sensor.mylight_systems_consommation_reseau_sans_batterie_virtuelle'), this.attributes.get('last_bought', 0), this.attributes.get('last_bought_day', this.attributes.get('day', ''))) | float %}
+            {% set reinjected = counter_delta_kwh(expand('sensor.mylight_systems_energie_reinjectee_au_reseau'), this.attributes.get('last_reinjected', 0), this.attributes.get('last_reinjected_day', this.attributes.get('day', ''))) | float %}
             {% set price = states('sensor.prix_electricite') | float(0.2142) %}
             {{ mylight_energy_cost(this.attributes.get('ml_energy_eur') | float((baseline() | from_json).ml_energy_eur), bought, reinjected, price) }}
           edf_panels_eur: >
             {% from 'mylight.jinja' import baseline %}
-            {% from 'mylight_profitability.jinja' import energy_delta_kwh, edf_with_panels_cost %}
-            {% set same_day = this.attributes.get('day') == now().date() | string %}
-            {% set bought = energy_delta_kwh(states('sensor.mylight_systems_consommation_reseau_sans_batterie_virtuelle'), this.attributes.get('last_bought', 0), same_day) | float %}
-            {% set returned = energy_delta_kwh(states('sensor.mylight_systems_decharge_batterie'), this.attributes.get('last_returned', 0), same_day) | float %}
+            {% from 'mylight_profitability.jinja' import counter_delta_kwh, edf_with_panels_cost %}
+            {% set bought = counter_delta_kwh(expand('sensor.mylight_systems_consommation_reseau_sans_batterie_virtuelle'), this.attributes.get('last_bought', 0), this.attributes.get('last_bought_day', this.attributes.get('day', ''))) | float %}
+            {% set returned = counter_delta_kwh(expand('sensor.mylight_systems_decharge_batterie'), this.attributes.get('last_returned', 0), this.attributes.get('last_returned_day', this.attributes.get('day', ''))) | float %}
             {{ edf_with_panels_cost(this.attributes.get('edf_panels_eur') | float((baseline() | from_json).edf_panels_eur), bought, returned, is_state('binary_sensor.heures_creuses', 'on')) }}
           no_panels_eur: >
             {% from 'mylight.jinja' import baseline %}
-            {% from 'mylight_profitability.jinja' import energy_delta_kwh, edf_without_panels_cost %}
-            {% set same_day = this.attributes.get('day') == now().date() | string %}
-            {% set bought = energy_delta_kwh(states('sensor.mylight_systems_consommation_reseau_sans_batterie_virtuelle'), this.attributes.get('last_bought', 0), same_day) | float %}
-            {% set returned = energy_delta_kwh(states('sensor.mylight_systems_decharge_batterie'), this.attributes.get('last_returned', 0), same_day) | float %}
-            {% set green = energy_delta_kwh(states('sensor.mylight_systems_energie_verte_solaire_direct'), this.attributes.get('last_green', 0), same_day) | float %}
+            {% from 'mylight_profitability.jinja' import counter_delta_kwh, edf_without_panels_cost %}
+            {% set bought = counter_delta_kwh(expand('sensor.mylight_systems_consommation_reseau_sans_batterie_virtuelle'), this.attributes.get('last_bought', 0), this.attributes.get('last_bought_day', this.attributes.get('day', ''))) | float %}
+            {% set returned = counter_delta_kwh(expand('sensor.mylight_systems_decharge_batterie'), this.attributes.get('last_returned', 0), this.attributes.get('last_returned_day', this.attributes.get('day', ''))) | float %}
+            {% set green = counter_delta_kwh(expand('sensor.mylight_systems_energie_verte_solaire_direct'), this.attributes.get('last_green', 0), this.attributes.get('last_green_day', this.attributes.get('day', ''))) | float %}
             {{ edf_without_panels_cost(this.attributes.get('no_panels_eur') | float((baseline() | from_json).no_panels_eur), bought, returned, green, is_state('binary_sensor.heures_creuses', 'on')) }}
           fixed_eur: >
             {% from 'mylight.jinja' import msb_forfaits, baseline %}

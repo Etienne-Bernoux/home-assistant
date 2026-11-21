@@ -1,3 +1,21 @@
+{% macro reading_day(readings, fallback) -%}
+  {%- set reading = readings | first | default(none) -%}
+  {%- if reading is not none and reading.state | is_number -%}
+    {{- as_local(as_datetime(reading.last_updated)).date() -}}
+  {%- else -%}
+    {{- fallback -}}
+  {%- endif -%}
+{%- endmacro %}
+
+{% macro counter_delta_kwh(readings, previous, previous_day) -%}
+  {%- set reading = readings | first | default(none) -%}
+  {%- if reading is none -%}
+    0
+  {%- else -%}
+    {{- energy_delta_kwh(reading.state, previous, reading_day(readings, previous_day) == previous_day) -}}
+  {%- endif -%}
+{%- endmacro %}
+
 {% macro energy_delta_kwh(current, previous, same_day) -%}
   {%- set current = current | float(none) -%}
   {%- set previous = previous | float(0) if same_day else 0 -%}
