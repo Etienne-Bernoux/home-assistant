@@ -1,5 +1,6 @@
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
+import { energyInWh, TO_WH } from "./energy-units.mjs";
 
 const MYLIGHT = "https://myhome.mylight-systems.com";
 const TIME_ZONE = "Europe/Paris";
@@ -9,7 +10,6 @@ const ENGINE = "sensor.rentabilite_mylight_compteurs";
 const TRV = { peak: 0.2142, off_peak: 0.1589 };
 const FEED_IN = 0.042;
 const OFF_PEAK = [["02:00", "07:00"], ["12:30", "15:30"]];
-const TO_WH = { Wh: 1, kWh: 1e3, MWh: 1e6 };
 const DRY_RUN = process.argv.includes("--dry-run");
 const HA_URL = process.env.HA_URL;
 const HA_TOKEN = process.env.HA_TOKEN;
@@ -209,7 +209,7 @@ const targets = [
         { id: "sensor.cout_annexe", eur: (t) => (annex.get(t) / 1000) * tariffAt(t).peak },
       ]
     : []),
-  { id: "sensor.envoy_122333060519_production_d_energie_totale", weight: (t) => Math.max(0, (myLight.get(t)?.produced ?? 0) - 16) },
+  { id: "sensor.envoy_122333060519_energie_fournie_ct_de_production", weight: (t) => Math.max(0, (myLight.get(t)?.produced ?? 0) - 16) },
   { id: "sensor.prise_bureau_energie", weight: () => 1 },
   { id: "sensor.prise_cellier_energie", weight: () => 1 },
 ];
@@ -230,10 +230,18 @@ for (const target of targets) {
   }
   let perHour;
   if (target.weight) {
-    const history = await ha.call({ type: "history/history_during_period", start_time: new Date(FROM - 6 * HOUR).toISOString(), end_time: new Date(TO + 3 * HOUR).toISOString(), entity_ids: [target.id], minimal_response: true, no_attributes: true });
-    const points = (history[target.id] ?? []).map((p) => ({ t: (p.lu ?? p.lc) * 1000, v: parseFloat(p.s) })).filter((p) => Number.isFinite(p.v));
-    const kwh = hourlyFromStates(points, target.weight);
-    perHour = (t) => ((kwh.get(t) ?? 0) * 1000) / TO_WH[unit];
+    const history = await ha.call({ type: "history/history_during_period", start_time: new Date(FROM - 6 * HOUR).toISOString(), end_time: new Date(TO + 3 * HOUR).toISOString(), entity_ids: [target.id], minimal_response: false, no_attributes: false });
+    const points = [];
+    let stateUnit;
+    for (const point of history[target.id] ?? []) {
+      stateUnit = point.a?.unit_of_measurement ?? stateUnit;
+      const value = parseFloat(point.s);
+      if (!Number.isFinite(value)) continue;
+      if (!TO_WH[stateUnit]) throw new Error(`${target.id}: unsupported history unit ${stateUnit}`);
+      points.push({ t: (point.lu ?? point.lc) * 1000, v: energyInWh(value, stateUnit) });
+    }
+    const wh = hourlyFromStates(points, target.weight);
+    perHour = (t) => (wh.get(t) ?? 0) / TO_WH[unit];
   } else if (target.eur) perHour = target.eur;
   else perHour = (t) => target.wh(t) / TO_WH[unit];
   let sum = base.sum;

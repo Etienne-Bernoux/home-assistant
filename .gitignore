@@ -16,3 +16,5 @@ config/custom_templates/mylight.jinja
 docs/ideation/
 LOCAL.md
 .claude/
+
+/tests/node_modules/

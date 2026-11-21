@@ -7,7 +7,7 @@ Configuration versionnée d'un Home Assistant domestique (Raspberry Pi 4, Home A
 | Fichier | Rôle |
 |---|---|
 | `config/packages/energy_tariff.yaml` | Plages d'heures creuses et prix du kWh en vigueur |
-| `config/packages/mylight_profitability.yaml` | Gain de la batterie virtuelle face à EDF Tarif Bleu, économie de l'installation, dates de retour sur investissement, état de charge de la batterie virtuelle, et puissances de la batterie virtuelle et du réseau facturé, qui partagent la puissance nette mesurée par l'Envoy selon le stock (affichés dans l'onglet Énergie), et les mêmes cumuls, dates et montants annuels avec l'annexe refacturée : sa majoration, écart entre le prix heures pleines qu'elle doit et le Tarif Bleu heures pleines, sur ses kWh relevés au sous-compteur puis mesurés par le Shelly |
+| `config/packages/mylight_profitability.yaml` | Gain de la batterie virtuelle face à EDF Tarif Bleu, économie de l'installation, dates de retour sur investissement, état de charge de la batterie virtuelle, et puissances de la batterie virtuelle et du réseau facturé, qui partagent la puissance nette mesurée par l'Envoy selon le stock, et les mêmes cumuls, dates et montants annuels avec l'annexe refacturée : sa majoration, écart entre le prix heures pleines qu'elle doit et le Tarif Bleu heures pleines, sur ses kWh relevés au sous-compteur puis mesurés par le Shelly |
 | `config/packages/notifications.yaml` | Alertes push : sources de données muettes, intégration Alexa rechargée seule quand les trois Echo ne donnent plus leur température depuis 15 minutes, sauvegarde manquante, redémarrage, sonnette, annexe au-dessus de son seuil réglable (18 A conseillé) pendant 15 minutes sur sa ligne de 20 A, prise du congélateur du cellier coupée ou muette, prise du frigo de la cuisine coupée ou muette, Shelly 1PM de la pompe coupé, resté éteint une minute ou muet (il se rallume de lui-même 5 secondes après toute coupure, `auto_on` réglé dans le Shelly, et Home Assistant le rallume aussi après une protection, surintensité, surcharge ou surchauffe, au démarrage du moteur), coup de sonnette repéré dans l'historique Ring quand l'événement en direct n'est pas arrivé (secours tant que la bibliothèque de notifications push de Ring plante sur certains messages), chauffe-eau pas chauffé la nuit ou à midi ou sans atteindre sa consigne depuis 7 jours (contrôle à 8 h), micro-onduleur sous la moitié de la production médiane du jour (contrôle 30 minutes avant le coucher du soleil), et annonce sur les Echo à 18 h 30 des Yoto des enfants sous 20 % et pas en charge |
 | `config/packages/solar.yaml` | Ensoleillement reçu à la maison, cumulé heure par heure depuis le rayonnement Open-Meteo, comparé à la production dans l'onglet Solaire |
 | `config/packages/water_heater.yaml` | Chauffe-eau en chauffe au-dessus de 100 W, d'après la puissance mesurée par MyLight, pour colorer son icône sur le plan du rez-de-chaussée, chauffe-eau pas chauffé si le relais MyLight ne s'est pas fermé entre minuit et 7 h 30 ou entre 7 h et 15 h 45, icône alors rouge, chauffe avancée à 1 h et 11 h 30 quand le ballon chauffait encore à la fin de la plage précédente (résistance à moitié hors service), et dernière fois à température : heure où le thermostat a coupé, relais fermé, après au moins 10 minutes de chauffe |
@@ -50,6 +50,26 @@ Après le premier redémarrage qui crée `weather_advice.yaml`, régler les troi
 HA_URL=http://192.168.1.250 HA_TOKEN=… node scripts/test-weather-advice.mjs
 ```
 
+## Retrouver et tester une règle
+
+| Domaine | Configuration et calculs |
+|---|---|
+| Solaire, batterie virtuelle et tarifs | `config/packages/solar.yaml`, `mylight_profitability.yaml`, `energy_tariff.yaml` et les macros MyLight de `config/custom_templates/` |
+| Météo et rappels de pluie | `config/packages/weather_advice.yaml` et `config/custom_templates/weather_advice.jinja` |
+| Température et chauffe-eau | `config/packages/temperature.yaml`, `water_heater.yaml` et `notifications.yaml` |
+| Annexe et protections électriques | `config/packages/annex.yaml` et `notifications.yaml` |
+| Appareils, alertes et musique | `config/packages/notifications.yaml` et `music.yaml` |
+
+Les scénarios Gherkin sont rangés par domaine dans `tests/`. Les deux scénarios Énergie contrôlent sur Nyons les statistiques solaires du 20 novembre 2026 et les sources du tableau. Ils lisent Home Assistant sans déclencher d’automatisation ni écrire de statistiques. GitHub Actions exécute les scénarios hors ligne à chaque push et pull request. Les scénarios marqués `@nyons` s’exécutent depuis un poste qui peut joindre Home Assistant.
+
+```bash
+npm ci --prefix tests
+npm test --prefix tests -- --tags "not @nyons"
+HA_URL=http://192.168.1.250 HA_TOKEN="$(security find-generic-password -s ha-nyons -w)" npm test --prefix tests
+```
+
+Pour ajouter un scénario, décrire un résultat observable dans le fichier `.feature` du domaine et faire exécuter la règle existante par les étapes de test. Les calculs météo ont déjà un test via `/api/template` avec des prévisions fabriquées. Les automatisations qui pilotent un appareil ou envoient une notification nécessitent des entrées et des actions simulées pour pouvoir tester leurs déclencheurs, conditions et effets sans intervenir sur la maison.
+
 ## Rattraper une panne
 
 Une fois Home Assistant revenu et au moins trois heures après la dernière heure fausse, lancer le rattrapage à blanc puis pour de bon, et le relancer à blanc pour vérifier qu'il ne reporte plus rien :
@@ -57,6 +77,8 @@ Une fois Home Assistant revenu et au moins trois heures après la dernière heur
 ```bash
 HA_URL=http://192.168.1.250 HA_TOKEN=… SHELLY_ANNEX_URL=http://<ip du Shelly de l'annexe> node scripts/rebuild-energy-gap.mjs --from=2026-11-18T07:00:00Z --to=2026-11-20T06:00:00Z --dry-run
 ```
+
+Pour les compteurs reconstruits à partir de leurs relevés, le script convertit chaque valeur en Wh selon l'unité de l'état historique (Wh, kWh ou MWh) avant de calculer les écarts. Il reconvertit ensuite les écarts dans l'unité de la série statistique. La production solaire est rattrapée dans la série de la pince CT de l'Envoy.
 
 S'il annonce une correction de la page Rentabilité, l'ajouter une seule fois aux trois attributs de `sensor.rentabilite_mylight_compteurs` : dans `mylight_profitability.yaml`, ajouter le montant à chaque formule sous la condition d'un attribut drapeau absent, poser cet attribut à `true`, déployer, recharger les templates, vérifier que le gain et l'économie ont bougé du montant annoncé, puis retirer le code et redéployer. La courbe de puissance en direct ne se rattrape pas.
 
@@ -69,4 +91,4 @@ Les intégrations (Enphase, MyLight, Ring, Google Drive, Tailscale), le contenu 
 - **MyLight** : ne jamais activer le niveau de log `debug` pour cette intégration, il écrit le mot de passe MyLight dans `home-assistant.log` ; ne pas utiliser son service d'export CSV, il dépose le fichier dans `/config/www/`, servi sans authentification. Ses mises à jour arrivent par le Marketplace (Paramètres > Mises à jour) : lire le changelog du dépôt amont avant d'installer, puis redémarrer.
 - **Page Rentabilité** : à chaque changement de forfait MySmartBattery ou de prix, ajouter une ligne datée dans `mylight.jinja` (`ml_tariffs`, ou `msb_forfaits` avec la capacité du palier en `kwh`), sans toucher aux lignes passées, puis recharger les templates personnalisés. Mettre à jour `reference_year` chaque automne avec les volumes des 12 derniers mois. À chaque relevé du sous-compteur de l'annexe, ajouter dans `annex_billing` une ligne avec la date, l'index et le prix heures pleines facturé ; la mesure du Shelly repart alors de ce relevé. Recalculer `reference_kwh` (kWh de l'annexe sur l'année de référence) en même temps que `reference_year`.
 - **Shelly** : l'état du relais au retour du courant se règle dans chaque Shelly (`Switch.SetConfig`, `initial_state`), pas dans Home Assistant. Il est sur `on` pour les huit (prise du cellier avec le congélateur, 1PM de la pompe, entrée détachée et seuil de courant à 16 A, prise du frigo, prise du lave-vaisselle, prise du lave-linge, prise du bureau, prise du radiateur, annexe) ; un Shelly neuf arrive sur `off`. Le bouton des six prises Plug M est détaché (`PLUGS_UI.SetConfig`, `controls.switch:0.in_mode` à `detached`) : un appui ne coupe plus l'appareil, on le coupe depuis Home Assistant ou en débranchant ; une prise neuve arrive en `momentary`.
-- **Tableau Énergie** : achats et réinjection viennent de MyLight, la batterie virtuelle aussi (charge et décharge), le solaire de l'Envoy. L'historique antérieur à la mise en service est horaire : les totaux journaliers (Enphase pour le solaire, MyLight pour le reste) répartis heure par heure selon le profil horaire de l'API MyLight ; les heures absentes chez MyLight reportent leur énergie sur l'heure suivante.
+- **Tableau Énergie** : achats et réinjection viennent de MyLight, la batterie virtuelle aussi (charge et décharge). En direct, le réseau affiche la puissance nette mesurée par l’Envoy. La batterie virtuelle figure dans les bilans d’énergie MyLight et son état de charge reste affiché. Le solaire utilise l'énergie fournie et la puissance mesurées par la pince de production (CT) de l'Envoy. Le 20 novembre 2026 à 17 h, heure de Paris, l'ancien compteur a décroché alors que la pince continuait à mesurer. Les statistiques horaires antérieures à ce créneau ont été reprises dans la série CT. L'historique antérieur à la mise en service est horaire : les totaux journaliers (Enphase pour le solaire, MyLight pour le reste) sont répartis heure par heure selon le profil horaire de l'API MyLight ; les heures absentes chez MyLight reportent leur énergie sur l'heure suivante.

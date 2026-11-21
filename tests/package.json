@@ -1,0 +1,11 @@
+{
+  "name": "nyons-home-assistant-tests",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "cucumber-js --import 'features/**/*.steps.mjs' 'features/**/*.feature'"
+  },
+  "devDependencies": {
+    "@cucumber/cucumber": "13.3.0"
+  }
+}
