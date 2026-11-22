@@ -44,6 +44,21 @@ template:
               {{ through }}
             {% endif %}
 
+  - sensor:
+      - name: Écart de production de l'Envoy
+        unique_id: envoy_production_gap
+        icon: mdi:solar-power-variant-outline
+        unit_of_measurement: kWh
+        availability: >
+          {{ ['sensor.envoy_122333060519_production_d_energie_totale', 'sensor.envoy_122333060519_energie_fournie_ct_de_production']
+             | map('states') | select('is_number') | list | count == 2 }}
+        state: >
+          {% from 'solar.jinja' import envoy_production_gap_kwh %}
+          {% set production = 'sensor.envoy_122333060519_production_d_energie_totale' %}
+          {% set ct = 'sensor.envoy_122333060519_energie_fournie_ct_de_production' %}
+          {{ envoy_production_gap_kwh(states(production), state_attr(production, 'unit_of_measurement'),
+                                      states(ct), state_attr(ct, 'unit_of_measurement')) }}
+
 automation:
   - id: solar_inverter_underperforming
     alias: Alerter si un micro-onduleur a produit moins de la moitié des autres
@@ -75,3 +90,31 @@ automation:
             ({{ weak | join(', ') }})
             {{ 'ont' if weak | count > 1 else 'a' }} produit moins de la moitié des {{ median | round(0) | int }} Wh
             des autres aujourd'hui : panne, ombre nouvelle ou panneau sale. Voir la page Solaire.
+
+  - id: solar_production_diverged
+    alias: Recharger l'intégration Enphase quand sa production s'écarte du CT
+    mode: single
+    triggers:
+      - trigger: numeric_state
+        entity_id: sensor.ecart_de_production_de_l_envoy
+        above: 1
+        for: "00:10:00"
+    actions:
+      - variables:
+          gap: "{{ trigger.to_state.state | float(0) | round(0) | int }}"
+      - action: homeassistant.reload_config_entry
+        target:
+          entity_id: sensor.envoy_122333060519_production_d_energie_totale
+      - wait_template: "{{ states('sensor.ecart_de_production_de_l_envoy') | float(2) <= 1 }}"
+        timeout: "00:05:00"
+      - action: notify.mobile_app_pixel_6
+        data:
+          title: Panneaux solaires
+          message: >
+            La production de l'Envoy s'écartait de {{ gap }} kWh de son CT depuis 10 minutes.
+            {% if wait.completed %}
+              L'intégration Enphase a été rechargée et la production est revenue.
+            {% else %}
+              Recharger l'intégration Enphase n'a pas suffi.
+            {% endif %}
+            Les statistiques de production de cette période sont à corriger.

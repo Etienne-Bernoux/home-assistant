@@ -1,6 +1,6 @@
 # Automatisations et scripts de Nyons
 
-Les fichiers ci-dessous sont organisés par domaine. Chaque règle garde son identifiant Home Assistant. Le [catalogue Gherkin](../tests/features/automation/catalog.feature) vérifie les identifiants, les déclencheurs et les actions déclarés. Les [scénarios météo](../tests/features/weather/forecast.feature) vérifient aussi les résultats des macros avec des prévisions simulées. Les tests [annexe](../tests/features/annex/protection.feature) et [heures creuses](../tests/features/energy/tariff.feature) évaluent leurs calculs avec des entrées simulées. Les autres règles ont une couverture de câblage (déclencheurs et actions déclarés).
+Les fichiers ci-dessous sont organisés par domaine. Chaque règle garde son identifiant Home Assistant. Le [catalogue Gherkin](../tests/features/automation/catalog.feature) vérifie les identifiants, les déclencheurs et les actions déclarés. Les [scénarios météo](../tests/features/weather/forecast.feature) vérifient aussi les résultats des macros avec des prévisions simulées. Les tests [annexe](../tests/features/annex/protection.feature), [heures creuses](../tests/features/energy/tariff.feature) et [production de l'Envoy](../tests/features/solar/production.feature) évaluent leurs calculs avec des entrées simulées. Les autres règles ont une couverture de câblage (déclencheurs et actions déclarés).
 
 ## Annexe
 
@@ -47,6 +47,7 @@ Les fichiers ci-dessous sont organisés par domaine. Chaque règle garde son ide
 [Configuration solar.yaml](../config/packages/solar.yaml)
 
 - Alerter si un micro-onduleur a produit moins de la moitié des autres (`solar_inverter_underperforming`)
+- Recharger l'intégration Enphase quand sa production s'écarte du CT (`solar_production_diverged`)
 
 ## Chauffe-eau
 

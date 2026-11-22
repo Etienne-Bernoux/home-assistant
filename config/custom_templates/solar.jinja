@@ -1,0 +1,6 @@
+{% macro envoy_production_gap_kwh(production, production_unit, ct, ct_unit) -%}
+  {%- set to_kwh = {'Wh': 0.001, 'kWh': 1, 'MWh': 1000} -%}
+  {%- if production | is_number and ct | is_number and production_unit in to_kwh and ct_unit in to_kwh -%}
+    {{- (production | float * to_kwh[production_unit] - ct | float * to_kwh[ct_unit]) | abs | round(3) -}}
+  {%- endif -%}
+{%- endmacro %}

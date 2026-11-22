@@ -24,6 +24,7 @@ Configuration versionnée d'un Home Assistant domestique (Raspberry Pi 4, Home A
 | `config/packages/music.yaml` | Lancement d'une demande Alexa (musique, radio, livre audio) sur l'Echo de la pièce choisie, utilisé par la page Musique |
 | `config/packages/weather_advice.yaml` | Consignes météo vocales sur l'appareil choisi (Partout par défaut, un Echo ou le téléphone) : à 20 h volets, linge et gel selon la prévision Met.no, et en journée un rappel 2 h avant la pluie ; seuils réglables dans l'onglet Températures |
 | `config/custom_templates/weather_advice.jinja` | Décision des consignes météo à partir de la prévision horaire, sans effet de bord |
+| `config/custom_templates/solar.jinja` | Écart entre la production de l'Envoy et son CT ; au-delà de 1 kWh pendant 10 minutes, l'intégration Enphase est rechargée et une alerte part |
 | `config/custom_templates/mylight.example.jinja` | Catalogue daté des tarifs, forfaits, volumes de référence, investissements et relevés du sous-compteur de l'annexe, avec des valeurs fictives |
 | `scripts/deploy.sh` | Déploiement sur le Pi avec retour arrière |
 | `scripts/import-battery-history.mjs` | Import de l'historique horaire officiel du stock de la batterie virtuelle depuis l'API MyLight (`HA_URL`, `HA_TOKEN`, identifiants MyLight dans le trousseau macOS, entrée `mylight`) |
@@ -56,7 +57,7 @@ HA_URL=http://192.168.1.250 HA_TOKEN=… node scripts/test-weather-advice.mjs
 
 | Domaine | Configuration et calculs |
 |---|---|
-| Solaire, batterie virtuelle et tarifs | `config/packages/solar.yaml`, `mylight_profitability.yaml`, `energy_tariff.yaml` et les macros MyLight de `config/custom_templates/` |
+| Solaire, batterie virtuelle et tarifs | `config/packages/solar.yaml`, `mylight_profitability.yaml`, `energy_tariff.yaml`, `config/custom_templates/solar.jinja` et les macros MyLight de `config/custom_templates/` |
 | Météo et rappels de pluie | `config/packages/weather_advice.yaml` et `config/custom_templates/weather_advice.jinja` |
 | Température et chauffe-eau | `config/packages/temperature.yaml` et `water_heater.yaml` |
 | Annexe et protections électriques | `config/packages/annex.yaml` |
