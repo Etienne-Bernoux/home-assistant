@@ -116,7 +116,9 @@ inventory() {
     for item in configuration.yaml packages custom_templates dashboards www; do
       if [ -e "$item" ] || [ -L "$item" ]; then
         find "$item" \( -path custom_templates/mylight.jinja -o -path www/community \) -prune -o \
-          \( -type f -exec sha256sum {} + -o ! -type d -print \) || exit 1
+          -type f -exec sha256sum {} + || exit 1
+        find "$item" \( -path custom_templates/mylight.jinja -o -path www/community \) -prune -o \
+          ! -type f ! -type d -print || exit 1
       fi
     done
   )
