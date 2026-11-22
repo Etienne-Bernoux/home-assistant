@@ -1,8 +1,8 @@
 # Automatisations et scripts de Nyons
 
-Les fichiers ci-dessous sont organisés par domaine. Chaque règle garde son identifiant Home Assistant. Le [catalogue Gherkin](../tests/features/automation/catalog.feature) vérifie les identifiants, les déclencheurs et les actions déclarés. Les [scénarios météo](../tests/features/weather/forecast.feature) vérifient aussi les résultats des macros avec des prévisions simulées. Les tests [annexe](../tests/features/annex/protection.feature), [heures creuses](../tests/features/energy/tariff.feature) et [production de l'Envoy](../tests/features/solar/production.feature) évaluent leurs calculs avec des entrées simulées. Les autres règles ont une couverture de câblage (déclencheurs et actions déclarés).
+Ce catalogue est généré à partir des packages Home Assistant. Pour le régénérer, lancer `node tests/generate-automation-catalog.mjs` depuis la racine du dépôt.
 
-## Annexe
+## annex
 
 [Configuration annex.yaml](../config/packages/annex.yaml)
 
@@ -11,7 +11,7 @@ Les fichiers ci-dessous sont organisés par domaine. Chaque règle garde son ide
 - Remettre à zéro les coupures de l'annexe après 30 minutes sans coupure (`annex_overload_cut_reset`)
 - Alerter si l'annexe tire près de la limite de sa ligne (`annex_line_overload`)
 
-## Appareils
+## devices
 
 [Configuration devices.yaml](../config/packages/devices.yaml)
 
@@ -21,14 +21,14 @@ Les fichiers ci-dessous sont organisés par domaine. Chaque règle garde son ide
 - Rallumer la prise de la pompe après une coupure de protection (`pump_plug_off`)
 - Rappeler de recharger les Yoto avant la nuit (`yoto_charge_reminder`)
 
-## Sonnette
+## doorbell
 
 [Configuration doorbell.yaml](../config/packages/doorbell.yaml)
 
 - Prévenir le téléphone quand on sonne (`doorbell_announce`)
 - Prévenir le téléphone d'un coup de sonnette vu dans l'historique Ring (`doorbell_history_fallback`)
 
-## Infrastructure
+## infrastructure
 
 [Configuration infrastructure.yaml](../config/packages/infrastructure.yaml)
 
@@ -36,20 +36,26 @@ Les fichiers ci-dessous sont organisés par domaine. Chaque règle garde son ide
 - Alerter si une sauvegarde échoue ou manque (`alert_backup_failed`)
 - Prévenir quand Home Assistant redémarre (`notify_home_assistant_started`)
 
-## Musique
+## music
 
 [Configuration music.yaml](../config/packages/music.yaml)
 
 - Lancer une musique ou un livre sur un Echo (`musique_lancer`)
 
-## Solaire
+## solar
 
 [Configuration solar.yaml](../config/packages/solar.yaml)
 
 - Alerter si un micro-onduleur a produit moins de la moitié des autres (`solar_inverter_underperforming`)
 - Recharger l'intégration Enphase quand sa production s'écarte du CT (`solar_production_diverged`)
 
-## Chauffe-eau
+## temperature
+
+[Configuration temperature.yaml](../config/packages/temperature.yaml)
+
+- Réguler le chauffage du bureau (`office_heating_schedule`)
+
+## water_heater
 
 [Configuration water_heater.yaml](../config/packages/water_heater.yaml)
 
@@ -57,14 +63,7 @@ Les fichiers ci-dessous sont organisés par domaine. Chaque règle garde son ide
 - Alerter si le chauffe-eau n'a pas chauffé pendant les heures creuses (`water_heater_missed_heating`)
 - Alerter si le chauffe-eau n'a pas atteint sa consigne depuis 7 jours (`water_heater_not_full_for_a_week`)
 
-## Chauffage du bureau
-
-[Configuration temperature.yaml](../config/packages/temperature.yaml)
-
-- Réguler le radiateur d’appoint via sa prise Shelly, d’après la température de l’Echo du bureau (`office_heating_schedule`). Les jours ouvrés, la chauffe démarre sous 19 °C à partir de 8 h pour viser 19 °C à 9 h, et s’arrête à 19,5 °C. À partir de 18 h et les jours non ouvrés, elle démarre sous 12,5 °C et s’arrête à 13 °C. La chauffe est coupée si la mesure manque ou date de 10 minutes ou plus.
-- L’intégration Workday est configurée dans l’interface pour la France, du lundi au vendredi hors jours fériés, et fournit `binary_sensor.workday_sensor_fr`.
-
-## Météo
+## weather_advice
 
 [Configuration weather_advice.yaml](../config/packages/weather_advice.yaml)
 
