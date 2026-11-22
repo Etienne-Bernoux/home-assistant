@@ -26,7 +26,14 @@ lovelace:
       title: Maison
       icon: mdi:floor-plan
       show_in_sidebar: true
+      require_admin: true
       filename: dashboards/maison.yaml
+    dashboard-maison-famille:
+      mode: yaml
+      title: Maison famille
+      icon: mdi:home-heart
+      show_in_sidebar: true
+      filename: dashboards/maison-famille.yaml
     dashboard-musique:
       mode: yaml
       title: Musique
@@ -38,6 +45,7 @@ lovelace:
       title: Annexe
       icon: mdi:home-floor-a
       show_in_sidebar: true
+      require_admin: true
       filename: dashboards/annexe.yaml
 
 automation: !include automations.yaml

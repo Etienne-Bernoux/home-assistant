@@ -1,0 +1,79 @@
+title: Maison famille
+views:
+  - title: Étage
+    path: etage
+    icon: mdi:home-floor-1
+    type: sections
+    max_columns: 1
+    sections:
+      - type: grid
+        cards:
+          - type: button
+            name: Énergie
+            icon: mdi:lightning-bolt
+            tap_action:
+              action: navigate
+              navigation_path: /energy
+          - type: picture-elements
+            image: /local/plan-etage.svg?v=4
+            elements:
+              - type: state-label
+                entity: sensor.temperature_cuisine
+                style:
+                  top: 61.4%
+                  left: 36.7%
+                tap_action: {action: none}
+                hold_action: {action: none}
+                double_tap_action: {action: none}
+              - type: state-label
+                entity: sensor.echo_dot_salon_temperature
+                style:
+                  top: 91.5%
+                  left: 59.8%
+                tap_action: {action: none}
+                hold_action: {action: none}
+                double_tap_action: {action: none}
+          - type: entities
+            title: État des appareils
+            entities:
+              - entity: sensor.annexe_puissance
+                name: Annexe
+  - title: Rez-de-chaussée
+    path: rez-de-chaussee
+    icon: mdi:home-floor-0
+    type: sections
+    max_columns: 1
+    sections:
+      - type: grid
+        cards:
+          - type: picture-elements
+            image: /local/plan-rdc.svg?v=4
+            elements:
+              - type: state-label
+                entity: sensor.echo_bureau_temperature
+                style:
+                  top: 42.3%
+                  left: 32.5%
+                tap_action: {action: none}
+                hold_action: {action: none}
+                double_tap_action: {action: none}
+          - type: entities
+            title: État des appareils
+            entities:
+              - entity: sensor.prise_pompe_puissance
+                name: Pompe
+              - entity: sensor.chauffe_eau_puissance
+                name: Chauffe-eau
+  - title: Terrain
+    path: terrain
+    icon: mdi:pine-tree
+    type: sections
+    max_columns: 1
+    sections:
+      - type: grid
+        cards:
+          - type: picture
+            image: /local/plan-terrain.svg?v=20
+            tap_action: {action: none}
+            hold_action: {action: none}
+            double_tap_action: {action: none}
