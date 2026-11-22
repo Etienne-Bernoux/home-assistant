@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { When, Then } from "@cucumber/cucumber";
 import { parse } from "yaml";
-import { render } from "../../../scripts/lib/home-assistant-template.mjs";
+import { render } from "../../support/home-assistant-template.mjs";
 
 When("Home Assistant évalue les heures creuses à {string}", async function (time) {
   assert.match(time, /^\d\d:\d\d$/);

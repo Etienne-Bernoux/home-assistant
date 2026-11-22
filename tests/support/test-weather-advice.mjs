@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import { pathToFileURL } from "node:url";
-
-import { render } from "./lib/home-assistant-template.mjs";
+import { renderWithLocalTemplates } from "./home-assistant-template.mjs";
 
 const DAY = "2026-11-10";
 const NEXT = "2026-11-11";
@@ -25,7 +24,7 @@ function forecast(from, hours, overrides = {}) {
 
 function evening(overrides) {
   const data = JSON.stringify(forecast(local(DAY, 19), 48, overrides));
-  return render(
+  return renderWithLocalTemplates(
     `{% from 'weather_advice.jinja' import evening_advice %}` +
       `{{ evening_advice('${data}' | from_json, '${DAY}T19:58:00+01:00', 28, 1, 0.5) }}`,
   );
@@ -36,7 +35,7 @@ function rain(hour, overrides, lastRain = "", day = DAY) {
   const now = new Date(local(day, hour).getTime() - 2 * 60_000)
     .toLocaleString("sv-SE", { timeZone: "Europe/Paris" })
     .replace(" ", "T");
-  return render(
+  return renderWithLocalTemplates(
     `{% from 'weather_advice.jinja' import rain_reminder %}` +
       `{{ rain_reminder('${data}' | from_json, '${now}+01:00', 0.5, '${lastRain}') }}`,
   );

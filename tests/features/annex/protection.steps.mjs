@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { When, Then } from "@cucumber/cucumber";
 import { parse } from "yaml";
-import { render } from "../../../scripts/lib/home-assistant-template.mjs";
+import { render } from "../../support/home-assistant-template.mjs";
 
 When("Home Assistant évalue la protection après la coupure numéro {int}", async function (attempt) {
   const { automation } = parse(readFileSync(new URL("../../../config/packages/annex.yaml", import.meta.url), "utf8"));

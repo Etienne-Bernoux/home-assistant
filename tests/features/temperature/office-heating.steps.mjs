@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { When, Then } from "@cucumber/cucumber";
 import { parse } from "yaml";
-import { render } from "../../../scripts/lib/home-assistant-template.mjs";
+import { render } from "../../support/home-assistant-template.mjs";
 
 const config = new URL("../../../config/packages/temperature.yaml", import.meta.url);
 

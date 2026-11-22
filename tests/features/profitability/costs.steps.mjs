@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { When, Then } from "@cucumber/cucumber";
 import { parse } from "yaml";
-import { render } from "../../../scripts/lib/home-assistant-template.mjs";
+import { renderWithLocalTemplates } from "../../support/home-assistant-template.mjs";
 
 const configDirectory = new URL("../../../config/", import.meta.url);
 const entities = {
@@ -67,12 +67,10 @@ When("le compteur de rentabilité traite {string}", async function (situation) {
 {% set expand = mock_expand | as_function %}
 {% set is_state = mock_off_peak | as_function %}
 `;
-  const macros = readFileSync(new URL("custom_templates/mylight_profitability.jinja", configDirectory), "utf8");
   this.costs = await Promise.all(costs.map((name) => {
     const template = engine.attributes[name]
-      .replace(/{% from 'mylight_profitability\.jinja' import [^%]+ %}/, macros)
       .replaceAll("now()", "test_now");
-    return render(context + template);
+    return renderWithLocalTemplates(context + template);
   }));
 });
 
