@@ -22,6 +22,7 @@ Fonctionnalité: Catalogue des automatisations et scripts de Nyons
       | infrastructure | alert_backup_failed              | state, time          | notify.mobile_app_pixel_6                                                     |
       | infrastructure | notify_home_assistant_started    | homeassistant        | notify.mobile_app_pixel_6                                                     |
       | solar          | solar_inverter_underperforming   | sun                  | notify.mobile_app_pixel_6                                                     |
+      | temperature    | office_heating_schedule          | homeassistant, state, time_pattern | switch.turn_off, switch.turn_on                                |
       | water_heater   | water_heater_preheat             | time                 | switch.turn_on                                                                |
       | water_heater   | water_heater_missed_heating      | state                | notify.mobile_app_pixel_6                                                     |
       | water_heater   | water_heater_not_full_for_a_week | time                 | notify.mobile_app_pixel_6                                                     |

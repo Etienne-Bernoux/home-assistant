@@ -56,6 +56,13 @@ Les fichiers ci-dessous sont organisés par domaine. Chaque règle garde son ide
 - Alerter si le chauffe-eau n'a pas chauffé pendant les heures creuses (`water_heater_missed_heating`)
 - Alerter si le chauffe-eau n'a pas atteint sa consigne depuis 7 jours (`water_heater_not_full_for_a_week`)
 
+## Chauffage du bureau
+
+[Configuration temperature.yaml](../config/packages/temperature.yaml)
+
+- Réguler le radiateur d’appoint via sa prise Shelly, d’après la température de l’Echo du bureau (`office_heating_schedule`). Les jours ouvrés, la chauffe démarre sous 19 °C à partir de 8 h pour viser 19 °C à 9 h, et s’arrête à 19,5 °C. À partir de 18 h et les jours non ouvrés, elle démarre sous 12,5 °C et s’arrête à 13 °C. La chauffe est coupée si la mesure manque ou date de 10 minutes ou plus.
+- L’intégration Workday est configurée dans l’interface pour la France, du lundi au vendredi hors jours fériés, et fournit `binary_sensor.workday_sensor_fr`.
+
 ## Météo
 
 [Configuration weather_advice.yaml](../config/packages/weather_advice.yaml)

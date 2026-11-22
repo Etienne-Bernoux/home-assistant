@@ -1,3 +1,47 @@
+automation:
+  - id: office_heating_schedule
+    alias: Réguler le chauffage du bureau
+    mode: restart
+    triggers:
+      - trigger: homeassistant
+        event: start
+      - trigger: time_pattern
+        minutes: "/1"
+      - trigger: state
+        entity_id:
+          - sensor.echo_bureau_temperature
+          - binary_sensor.workday_sensor_fr
+        to: null
+    variables:
+      local_time: "{{ now().strftime('%H:%M') }}"
+      workday: "{{ states('binary_sensor.workday_sensor_fr') }}"
+      relay: "{{ states('switch.prise_radiateur') }}"
+      reading: "{{ states('sensor.echo_bureau_temperature') }}"
+      reading_age: >-
+        {{ (now() - states.sensor.echo_bureau_temperature.last_reported).total_seconds()
+           if is_number(reading) else none }}
+      comfort: "{{ workday == 'on' and '08:00' <= local_time < '18:00' }}"
+      temperature: "{{ reading | float(none) }}"
+      valid_reading: >-
+        {{ temperature is not none and -40 < temperature < 60
+           and 0 <= reading_age < 600 }}
+      heat_below: "{{ 19 if comfort else 12.5 }}"
+      stop_at: "{{ 19.5 if comfort else 13 }}"
+    actions:
+      - choose:
+          - conditions: >-
+              {{ relay == 'on' and (not valid_reading or temperature >= stop_at) }}
+            sequence:
+              - action: switch.turn_off
+                target:
+                  entity_id: switch.prise_radiateur
+          - conditions: >-
+              {{ relay == 'off' and valid_reading and temperature < heat_below }}
+            sequence:
+              - action: switch.turn_on
+                target:
+                  entity_id: switch.prise_radiateur
+
 sensor:
   - platform: statistics
     name: Hausse température cuisine
