@@ -1,6 +1,22 @@
+import assert from "node:assert/strict";
 import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 import { parse } from "yaml";
+
+const packageTitles = new Map([
+  ["annex", "Annexe"],
+  ["devices", "Appareils"],
+  ["doorbell", "Sonnette"],
+  ["energy_tariff", "Tarifs d’électricité"],
+  ["infrastructure", "Infrastructure"],
+  ["music", "Musique"],
+  ["mylight_profitability", "Rentabilité photovoltaïque"],
+  ["notifications", "Notifications"],
+  ["solar", "Solaire"],
+  ["temperature", "Températures et chauffage"],
+  ["water_heater", "Chauffe-eau"],
+  ["weather_advice", "Météo"],
+]);
 
 const packagesDirectory = new URL("../config/packages/", import.meta.url);
 export const catalogPath = new URL("../docs/automations.md", import.meta.url);
@@ -21,10 +37,12 @@ export function packageRules(config) {
 
 export function renderCatalog(packages) {
   const sections = Object.entries(packages).flatMap(([name, config]) => {
+    const title = packageTitles.get(name);
+    assert.ok(title, `Missing catalog title for package: ${name}`);
     const rules = packageRules(config);
     if (!rules.length) return [];
     const entries = rules.map(({ id, alias }) => `- ${alias} (\`${id}\`)`).join("\n");
-    return [`## ${name}\n\n[Configuration ${name}.yaml](../config/packages/${name}.yaml)\n\n${entries}`];
+    return [`## ${title}\n\n[Configuration ${name}.yaml](../config/packages/${name}.yaml)\n\n${entries}`];
   });
 
   return [
