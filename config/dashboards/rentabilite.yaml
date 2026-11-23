@@ -149,16 +149,14 @@ views:
         cards:
           - type: markdown
             content: >
-              **Annexe refacturée.** L'annexe est une cliente : elle doit ses kWh au prix heures
-              pleines le plus cher de chaque période relevée au sous-compteur (catalogue
-              `annex_billing`), puis, depuis le 16 novembre 2026, à celui en vigueur sur les kWh
-              mesurés par le Shelly. Sans panneaux ni MyLight, elle paierait le Tarif Bleu heures
-              pleines (0,2142 €). La majoration est l'écart entre les deux, sur ses kWh depuis la
-              mise en service : elle s'ajoute au gain et à l'économie de la page « Avec l'annexe ».
-              Entre le dernier relevé et l'arrivée du Shelly, sa consommation est estimée au rythme
-              du dernier relevé ; un nouveau relevé la remplace. Le dû est compté, payé ou non.
-              Les kWh annuels attendus de l'annexe sont ceux de l'année de référence, au prorata
-              des relevés.
+              **Annexe refacturée.** Jusqu'au dernier relevé du sous-compteur, le 22 novembre 2026
+              à 19 h 20, les kWh de l'annexe sont facturés au prix heures pleines le plus cher
+              de chaque période relevée (catalogue `annex_billing`). Depuis ce relevé, le coût
+              et la majoration reposent sur les kWh mesurés par le Shelly EM et le tarif en
+              vigueur. La majoration est l'écart avec le Tarif Bleu heures pleines (0,2142 €)
+              sur les kWh de l'annexe depuis la mise en service. Elle s'ajoute au gain et à
+              l'économie de la page « Avec l'annexe ». Le dû est compté, payé ou non. Les kWh
+              annuels attendus viennent de l'année de référence.
   - title: Solaire
     path: solaire
     icon: mdi:solar-power-variant

@@ -66,7 +66,10 @@ Dans [mylight_profitability.yaml](config/packages/mylight_profitability.yaml), a
 ## Règles
 
 - **MyLight**. Laisser les logs de l’intégration hors du niveau `debug`, qui journalise le mot de passe. Éviter son export CSV dans `/config/www/`, accessible sans authentification. Lire le changelog avant chaque mise à jour du Marketplace, puis redémarrer.
-- **Rentabilité**. Ajouter les changements de tarifs et de forfaits à `mylight.jinja` avec leur date d’effet. Ajouter les relevés de l’annexe à `annex_billing`. Actualiser `reference_year` et `reference_kwh` chaque automne, puis recharger les templates.
+- **Rentabilité**. Ajouter les changements de tarifs et de forfaits à `mylight.jinja` avec leur date d’effet. Chaque automne, actualiser `reference_year` et recalculer `reference_kwh` sur la même période à partir des statistiques de `sensor.annexe_energie`, puis recharger les templates.
+- **Contrôle de l’annexe**. Le dernier relevé de facturation date du 22 novembre 2026 à 19 h 20, au tarif de 0,254 €/kWh.
+  Depuis ce relevé, le coût et la majoration reposent sur le Shelly EM. Pour contrôler la mesure, comparer l’écart du
+  sous-compteur depuis 20 676,5 kWh à celui de `sensor.annexe_energie` depuis 69,918 kWh.
 - **Shelly**. Régler `initial_state: on` sur les relais et détacher le bouton des six Plug M. Sur le 1PM de la pompe, détacher l’entrée et garder le seuil de courant de 16 A.
 - **Énergie**. Utiliser MyLight pour les achats, la réinjection et la batterie virtuelle. Utiliser la pince CT de l’Envoy pour la production solaire. Les statistiques antérieures au décrochage du compteur le 20 novembre 2026 ont été reprises dans la série CT.
 
