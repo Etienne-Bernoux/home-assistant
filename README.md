@@ -1,99 +1,78 @@
 # Home Assistant
 
-Configuration versionnée d'un Home Assistant domestique (Raspberry Pi 4, Home Assistant OS, disque USB) : installation solaire Enphase, fournisseur MyLight150 avec batterie virtuelle MySmartBattery, contrat heures pleines / heures creuses. `config/` reflète `/config` sur le Pi pour ce qui est écrit en YAML ; le reste vit dans l'interface.
+Configuration de la maison de Nyons, sur un Raspberry Pi 4 sous Home Assistant OS avec un disque USB. Elle couvre notamment le solaire Enphase, la batterie virtuelle MyLight150 et le suivi électrique de l’annexe.
 
-## Contenu
-
-| Fichier | Rôle |
+| Chemin | Contenu |
 |---|---|
-| `config/packages/energy_tariff.yaml` | Plages d'heures creuses et prix du kWh en vigueur |
-| `config/packages/mylight_profitability.yaml` | Gain de la batterie virtuelle face à EDF Tarif Bleu, économie de l'installation, dates de retour sur investissement, état de charge de la batterie virtuelle, et puissances de la batterie virtuelle et du réseau facturé, qui partagent la puissance nette mesurée par l'Envoy selon le stock, et les mêmes cumuls, dates et montants annuels avec l'annexe refacturée : sa majoration, écart entre le prix heures pleines qu'elle doit et le Tarif Bleu heures pleines, sur ses kWh relevés au sous-compteur puis mesurés par le Shelly |
-| `config/packages/infrastructure.yaml` | Disponibilité des sources, sauvegardes et démarrage de Home Assistant |
-| `config/packages/devices.yaml` | Echo, prises du frigo et du congélateur, pompe, Yoto |
-| `config/packages/doorbell.yaml` | Sonnette et secours via l’historique Ring |
-| `config/packages/solar.yaml` | Ensoleillement reçu à la maison, cumulé heure par heure depuis le rayonnement Open-Meteo, comparé à la production dans l'onglet Solaire |
-| `config/packages/water_heater.yaml` | Chauffe-eau en chauffe au-dessus de 100 W, d'après la puissance mesurée par MyLight, pour colorer son icône sur le plan du rez-de-chaussée, chauffe-eau pas chauffé si le relais MyLight ne s'est pas fermé entre minuit et 7 h 30 ou entre 7 h et 15 h 45, icône alors rouge, chauffe avancée à 1 h et 11 h 30 quand le ballon chauffait encore à la fin de la plage précédente (résistance à moitié hors service), et dernière fois à température : heure où le thermostat a coupé, relais fermé, après au moins 10 minutes de chauffe |
-| `config/packages/annex.yaml` | Coût de l'annexe : chaque kWh mesuré par le Shelly EM de sa ligne compté au prix heures pleines en vigueur, ce prix exposé en capteur, seuil d'alerte de courant réglable, et coupure automatique de l'annexe au-delà d'une puissance réglable pendant 30 s, remise seule après 1, 1, 3, 5 et 10 minutes puis à la main, chaque coupure notifiée, comme une coupure manuelle ou une annexe sans courant pendant 2 minutes (disjoncteur, contacteur) |
-| `config/dashboards/annexe.yaml` | Page Annexe, suivie comme une seconde maison : puissance, courant face à la ligne de 20 A, seuils d'alerte et de coupure, kWh et coût du jour, du mois et du mois précédent, par jour et par mois |
-| `config/dashboards/rentabilite.yaml` | Page Rentabilité, onglets Avec l'annexe (installation entière) et Sans l'annexe (annexe refacturée), et onglet Solaire : production en barres et ensoleillement en courbe, chacun sur son axe, sur 30 jours et sur 12 mois face à l'année précédente, et production du jour de chacun des 16 micro-onduleurs (capteurs activés dans le registre) |
-| `config/dashboards/maison.yaml` | Page Maison : un onglet par niveau, températures, présence, caméras, aspirateur, Yoto des enfants, chauffe-eau avec son relais MyLight, Raspberry Pi, alimentation et puissance de l'annexe (Shelly EM) puissance des prises du bureau, du cellier, du frigo, du lave-vaisselle et du lave-linge (Shelly Plug M), du radiateur d'appoint du bureau quand il chauffe (son icône l'allume ou l'éteint au toucher, le bouton de la prise étant détaché), et de la pompe (Shelly 1PM) posés sur le plan |
-| `config/dashboards/musique.yaml` | Page Musique : choix de la pièce, favoris Amazon Music, radio et Audible lancés sur les Echo, lecture en cours et volume des seules Echo qui jouent ou sont en pause, et onglet Yoto : lecture, batterie, charge, casque et réglages jour et nuit de chaque Yoto des enfants |
-| `config/www/plan-etage.svg`, `config/www/plan-rdc.svg`, `config/www/plan-terrain.svg` | Plans vectoriels des deux niveaux et du terrain, une forme identifiée par pièce, servis sans authentification sous `/local/` |
-| `config/www/plan-heatmap.js` | Élément `custom:plan-heatmap` de la page Maison : colore chaque pièce selon sa température (bleu à 16 °C, rouge à 25 °C) et ouvre le capteur au clic |
-| `config/packages/temperature.yaml` | Température de la cuisine, moyenne de l'Echo et du thermomètre Govee (Bluetooth du Pi et de la prise du frigo, relais en scanner actif), température moyenne de la maison, affichée dans l'onglet Températures et en favori de l'accueil, et poêle à bois de la cuisine : allumé quand l'Echo de la cuisine gagne au moins 2 °C en une heure en dépassant celui du salon de 3 °C, par moins de 18 °C dehors, éteint quand l'écart retombe sous 3 °C ; sa part d'allumage par heure alimente le graphique de l'onglet Températures |
-| `config/packages/music.yaml` | Lancement d'une demande Alexa (musique, radio, livre audio) sur l'Echo de la pièce choisie, utilisé par la page Musique |
-| `config/packages/weather_advice.yaml` | Consignes météo vocales sur l'appareil choisi (Partout par défaut, un Echo ou le téléphone) : à 20 h volets, linge et gel selon la prévision Met.no, et en journée un rappel 2 h avant la pluie ; seuils réglables dans l'onglet Températures |
-| `config/custom_templates/weather_advice.jinja` | Décision des consignes météo à partir de la prévision horaire, sans effet de bord |
-| `config/custom_templates/solar.jinja` | Écart entre la production de l'Envoy et son CT ; au-delà de 1 kWh pendant 10 minutes, l'intégration Enphase est rechargée et une alerte part |
-| `config/custom_templates/mylight.example.jinja` | Catalogue daté des tarifs, forfaits, volumes de référence, investissements et relevés du sous-compteur de l'annexe, avec des valeurs fictives |
-| `scripts/deploy.sh` | Déploiement sur le Pi avec retour arrière |
-| `scripts/import-battery-history.mjs` | Import de l'historique horaire officiel du stock de la batterie virtuelle depuis l'API MyLight (`HA_URL`, `HA_TOKEN`, identifiants MyLight dans le trousseau macOS, entrée `mylight`) |
-| `scripts/rebuild-energy-gap.mjs` | Rattrapage d'une panne de Home Assistant (`--from`, `--to` : première et dernière heure UTC fausses, `--dry-run`) : réécrit heure par heure les statistiques de la page Énergie et des compteurs de l'installation depuis la source la plus précise, flux MyLight et chauffe-eau depuis l'historique horaire MyLight, annexe et son coût depuis la mémoire minute du Shelly EM (`SHELLY_ANNEX_URL`, environ trois jours), production et prises depuis leurs relevés, trous répartis selon la courbe MyLight pour la production et à parts égales pour les prises, reporte l'écart sur les heures suivantes, et donne la correction à ajouter une fois aux cumuls de la page Rentabilité quand la panne a passé minuit (`HA_URL`, `HA_TOKEN`, identifiants MyLight dans le trousseau macOS, entrée `mylight`) |
-| `scripts/import-radiation-history.mjs` | Import de l'historique horaire d'ensoleillement Open-Meteo depuis mars 2025, à lancer une seule fois, au moins 5 minutes après le premier démarrage du capteur, pour que la série se raccorde au cumul en cours (`HA_URL`, `HA_TOKEN`) |
-| `scripts/test-weather-advice.mjs` | Tests de `weather_advice.jinja` sur le Pi avec des prévisions fabriquées (`HA_URL`, `HA_TOKEN`) |
+| [config/configuration.yaml](config/configuration.yaml) | Chargement des packages et des tableaux de bord |
+| [config/packages/](config/packages/) | Capteurs, helpers, automatisations et scripts. Voir le [catalogue généré](docs/automations.md). |
+| [config/custom_templates/](config/custom_templates/) | Macros Jinja et exemple de catalogue tarifaire MyLight |
+| [config/dashboards/](config/dashboards/) | Maison, Maison famille, Musique, Annexe et Rentabilité |
+| [config/www/](config/www/) | Plans et carte de températures |
+| [scripts/](scripts/) | Déploiement, import du stock MyLight et rattrapage des statistiques |
+| [tests/](tests/) | Scénarios Cucumber, utilitaires et générateur du catalogue |
 
 ## Installer
 
-1. Copier `config/custom_templates/mylight.example.jinja` en `config/custom_templates/mylight.jinja` et y mettre ses propres valeurs. Le vrai catalogue reste hors git.
-2. Installer l'intégration MyLight Systems par le Marketplace de Home Assistant (Paramètres > Marketplace, dépôt `acesyde/hassio_mylight_integration`, présent au catalogue), puis redémarrer. Elle n'est pas redistribuée ici.
-3. Installer la carte ApexCharts Card par le Marketplace (dépôt `RomRider/apexcharts-card`), utilisée par l'onglet Solaire.
-4. Déclarer un hôte SSH `ha` vers l'add-on Terminal & SSH du Pi.
+1. Déclarer l’hôte SSH `ha` vers le module Terminal & SSH du Pi.
+2. Installer MyLight Systems (`acesyde/hassio_mylight_integration`) et ApexCharts Card (`RomRider/apexcharts-card`) depuis le Marketplace de Home Assistant. Redémarrer après l’installation de l’intégration.
+3. Prendre [mylight.example.jinja](config/custom_templates/mylight.example.jinja) comme modèle et placer le catalogue réel dans `/config/custom_templates/mylight.jinja` sur le Pi.
+4. Configurer Workday dans l’interface pour la France, du lundi au vendredi hors jours fériés, avec l’entité `binary_sensor.workday_sensor_fr` utilisée par le [chauffage du bureau](config/packages/temperature.yaml).
+5. Après l’installation du package météo, régler les seuils dans l’onglet Températures. Les valeurs initiales utilisées à Nyons sont 28 °C pour la chaleur, 1 °C pour le gel et 0,5 mm pour la pluie.
 
 ## Déployer
 
-```bash
-./scripts/deploy.sh
-```
+Depuis un arbre Git propre, lancer `./scripts/deploy.sh`. Le script actualise `origin/main`, vérifie que `HEAD` figure dans son historique et copie sur le Pi les fichiers du commit. `./scripts/deploy.sh --branch` autorise explicitement un déploiement de test. Hors LAN, passer les options SSH indiquées dans `LOCAL.md` via `HA_SSH_OPTS`.
 
-Copie `configuration.yaml`, `packages/`, `custom_templates/`, `dashboards/` et `www/` sur le Pi (ils y sont remplacés en entier, sauf `www/community/`, réservé au Marketplace ; `custom_components/` n'est pas touché), puis lance `ha core check`. Hors du réseau local, `HA_SSH_OPTS` passe des options à `ssh` (par exemple l'adresse Tailscale du Pi, cf. `LOCAL.md`). La version précédente est gardée dans `/config/.deploy-previous` et remise en place automatiquement si le check échoue ; le script sort alors en erreur. Un nouveau package ou un changement de `configuration.yaml` demande ensuite un redémarrage de Home Assistant ; un changement de template ou d'automatisation se recharge sans redémarrage.
+Avant la copie, le script compare `configuration.yaml`, `packages/`, `custom_templates/`, `dashboards/` et `www/` au commit indiqué dans `/config/.deployed-commit` et refuse les écarts. Au premier déploiement, le périmètre géré doit correspondre à `origin/main` ou être vide. `custom_templates/mylight.jinja` et `www/community/` restent gérés sur le Pi.
 
-Après le premier redémarrage qui crée `weather_advice.yaml`, régler les trois seuils dans l'onglet Températures (28 °C, 1 °C, 0,5 mm) : sans valeur posée, ils partent du minimum de leur plage. Après une modification de `weather_advice.jinja`, recharger les templates personnalisés (`homeassistant.reload_custom_templates`) puis lancer les tests :
+La version précédente est conservée dans `/config/.deploy-previous`. Le script la restaure si `ha core check` échoue et enregistre le nouveau SHA après validation. Recharger selon le changement via `automation.reload`, `template.reload` et `homeassistant.reload_custom_templates`. Une modification de `configuration.yaml` ou l’ajout d’un package demande un redémarrage.
 
-```bash
-HA_URL=http://192.168.1.250 HA_TOKEN=… node scripts/test-weather-advice.mjs
-```
-
-## Retrouver et tester une règle
-
-| Domaine | Configuration et calculs |
-|---|---|
-| Solaire, batterie virtuelle et tarifs | `config/packages/solar.yaml`, `mylight_profitability.yaml`, `energy_tariff.yaml`, `config/custom_templates/solar.jinja` et les macros MyLight de `config/custom_templates/` |
-| Météo et rappels de pluie | `config/packages/weather_advice.yaml` et `config/custom_templates/weather_advice.jinja` |
-| Température et chauffe-eau | `config/packages/temperature.yaml` et `water_heater.yaml` |
-| Annexe et protections électriques | `config/packages/annex.yaml` |
-| Appareils, sonnette, infrastructure et musique | `config/packages/devices.yaml`, `doorbell.yaml`, `infrastructure.yaml` et `music.yaml` |
-
-Le [catalogue des automatisations](docs/automations.md) relie chaque règle à son package et à son identifiant Home Assistant. Les scénarios Gherkin sont rangés par domaine dans `tests/features/`. Les deux scénarios Énergie contrôlent sur Nyons les statistiques solaires du 20 novembre 2026 et les sources du tableau. Ils lisent Home Assistant sans déclencher d’automatisation ni écrire de statistiques. GitHub Actions exécute les scénarios hors ligne à chaque push et pull request. Les scénarios marqués `@nyons` s’exécutent depuis un poste qui peut joindre Home Assistant.
+## Tester
 
 ```bash
 npm ci --prefix tests
-npm test --prefix tests -- --tags "not @nyons"
+npm test --prefix tests -- --tags "not @jinja and not @nyons"
+```
+
+Avec Docker, Node.js, npm, jq, curl et OpenSSL, lancer `bash tests/support/run-with-home-assistant.sh`. Comme [GitHub Actions](.github/workflows/tests.yml), ce script lance un Home Assistant isolé pour exécuter les scénarios hors ligne et les scénarios `@jinja` à partir du dépôt.
+
+Après une mise à jour du Core sur le Pi, lire le champ `version` de `GET /api/config` et épingler cette version dans `tests/support/run-with-home-assistant.sh`.
+
+Les scénarios `@nyons` lisent le calendrier et les données Énergie du Pi. Pour exécuter toute la suite depuis un poste qui peut le joindre, utiliser son URL et le jeton du trousseau macOS.
+
+```bash
 HA_URL=http://192.168.1.250 HA_TOKEN="$(security find-generic-password -s ha-nyons -w)" npm test --prefix tests
 ```
 
-Pour ajouter un scénario, décrire un résultat observable dans le fichier `.feature` du domaine et faire exécuter la règle existante par les étapes de test. Les scénarios météo, heures creuses, protection de l’annexe et coûts de rentabilité évaluent du Jinja via `/api/template` avec des entrées simulées. Les automatisations qui pilotent un appareil ou envoient une notification nécessitent des entrées et des actions simulées pour pouvoir tester leurs déclencheurs, conditions et effets sans intervenir sur la maison.
-
-Les trois coûts d’énergie de la page Rentabilité et la conversion des index en kWh sont définis dans [`mylight_profitability.jinja`](config/custom_templates/mylight_profitability.jinja). Le [package de rentabilité](config/packages/mylight_profitability.yaml) fournit les relevés, les tarifs et le cumul précédent. Les [scénarios Gherkin](tests/features/profitability/costs.feature) comparent les résultats en euros sur des relevés simulés.
+Décrire dans [tests/features/](tests/features/) des résultats observables et réutiliser les templates du dépôt dans les étapes. Après un changement d’alias, d’identifiant ou de package, régénérer le [catalogue](docs/automations.md) avec `node tests/generate-automation-catalog.mjs`.
 
 ## Rattraper une panne
 
-Une fois Home Assistant revenu et au moins trois heures après la dernière heure fausse, lancer le rattrapage à blanc puis pour de bon, et le relancer à blanc pour vérifier qu'il ne reporte plus rien :
+Attendre au moins trois heures après la dernière heure à corriger. Lancer [rebuild-energy-gap.mjs](scripts/rebuild-energy-gap.mjs) à blanc, puis retirer `--dry-run` pour appliquer la correction. Relancer à blanc pour vérifier que le script ne propose plus de reprise.
 
 ```bash
-HA_URL=http://192.168.1.250 HA_TOKEN=… SHELLY_ANNEX_URL=http://<ip du Shelly de l'annexe> node scripts/rebuild-energy-gap.mjs --from=2026-11-18T07:00:00Z --to=2026-11-20T06:00:00Z --dry-run
+HA_URL=http://192.168.1.250 HA_TOKEN="$(security find-generic-password -s ha-nyons -w)" \
+  SHELLY_ANNEX_URL=http://adresse-du-shelly node scripts/rebuild-energy-gap.mjs \
+  --from=2026-11-18T07:00:00Z --to=2026-11-20T06:00:00Z --dry-run
 ```
 
-Pour les compteurs reconstruits à partir de leurs relevés, le script convertit chaque valeur en Wh selon l'unité de l'état historique (Wh, kWh ou MWh) avant de calculer les écarts. Il reconvertit ensuite les écarts dans l'unité de la série statistique. La production solaire est rattrapée dans la série de la pince CT de l'Envoy.
+Les bornes sont la première et la dernière heure UTC erronées. Renseigner `SHELLY_ANNEX_URL` pour reprendre l’annexe à partir de la mémoire du Shelly EM. Les données MyLight utilisent les identifiants du trousseau macOS (`mylight`).
 
-S'il annonce une correction de la page Rentabilité, l'ajouter une seule fois aux trois attributs de `sensor.rentabilite_mylight_compteurs` : dans `mylight_profitability.yaml`, ajouter le montant à chaque formule sous la condition d'un attribut drapeau absent, poser cet attribut à `true`, déployer, recharger les templates, vérifier que le gain et l'économie ont bougé du montant annoncé, puis retirer le code et redéployer. La courbe de puissance en direct ne se rattrape pas.
+Si le script annonce une correction de Rentabilité, l’appliquer une seule fois aux trois compteurs de `sensor.rentabilite_mylight_compteurs`.
 
-## Ce qui n'est pas dans ce dépôt
-
-Les intégrations (Enphase, MyLight, Ring, Google Drive, Tailscale), le contenu installé par le Marketplace (`custom_components/`, `www/community/`), les étages et les pièces, la ressource Lovelace `/local/plan-heatmap.js?v=N` (à incrémenter à chaque modification du fichier), les favoris de l'accueil, le tableau Énergie, les sauvegardes automatiques, les réglages du serveur HTTP l'unité d'affichage de la production de l'Envoy (kWh au lieu de MWh, pour l'onglet Solaire) et le relais Bluetooth de la prise du frigo (option « scanner Bluetooth » de son intégration Shelly, en actif), les identifiants lisibles des Shelly et du chauffe-eau (`annexe_*`, `prise_bureau_*`, `prise_cellier_*`, `prise_pompe_*`, `prise_lave_vaisselle_*`, `prise_lave_linge_*`, `prise_frigo_*`, `prise_radiateur_*`, `chauffe_eau_*`, renommés dans le registre des entités : un appareil remplacé se renomme pareil, sans toucher aux fichiers) sont configurés dans l'interface et stockés dans `.storage/`. Les sauvegardes quotidiennes chiffrées, sur le Pi et sur Google Drive, les couvrent.
+Dans [mylight_profitability.yaml](config/packages/mylight_profitability.yaml), appliquer les montants sous condition d’un attribut drapeau absent, poser le drapeau à `true`, déployer puis recharger les templates. Vérifier les montants, retirer le correctif temporaire et redéployer.
 
 ## Règles
 
-- **MyLight** : ne jamais activer le niveau de log `debug` pour cette intégration, il écrit le mot de passe MyLight dans `home-assistant.log` ; ne pas utiliser son service d'export CSV, il dépose le fichier dans `/config/www/`, servi sans authentification. Ses mises à jour arrivent par le Marketplace (Paramètres > Mises à jour) : lire le changelog du dépôt amont avant d'installer, puis redémarrer.
-- **Page Rentabilité** : à chaque changement de forfait MySmartBattery ou de prix, ajouter une ligne datée dans `mylight.jinja` (`ml_tariffs`, ou `msb_forfaits` avec la capacité du palier en `kwh`), sans toucher aux lignes passées, puis recharger les templates personnalisés. Mettre à jour `reference_year` chaque automne avec les volumes des 12 derniers mois. À chaque relevé du sous-compteur de l'annexe, ajouter dans `annex_billing` une ligne avec la date, l'index et le prix heures pleines facturé ; la mesure du Shelly repart alors de ce relevé. Recalculer `reference_kwh` (kWh de l'annexe sur l'année de référence) en même temps que `reference_year`.
-- **Shelly** : l'état du relais au retour du courant se règle dans chaque Shelly (`Switch.SetConfig`, `initial_state`), pas dans Home Assistant. Il est sur `on` pour les huit (prise du cellier avec le congélateur, 1PM de la pompe, entrée détachée et seuil de courant à 16 A, prise du frigo, prise du lave-vaisselle, prise du lave-linge, prise du bureau, prise du radiateur, annexe) ; un Shelly neuf arrive sur `off`. Le bouton des six prises Plug M est détaché (`PLUGS_UI.SetConfig`, `controls.switch:0.in_mode` à `detached`) : un appui ne coupe plus l'appareil, on le coupe depuis Home Assistant ou en débranchant ; une prise neuve arrive en `momentary`.
-- **Tableau Énergie** : achats et réinjection viennent de MyLight, la batterie virtuelle aussi (charge et décharge). En direct, le réseau affiche la puissance nette mesurée par l’Envoy. La batterie virtuelle figure dans les bilans d’énergie MyLight et son état de charge reste affiché. Le solaire utilise l'énergie fournie et la puissance mesurées par la pince de production (CT) de l'Envoy. Le 20 novembre 2026 à 17 h, heure de Paris, l'ancien compteur a décroché alors que la pince continuait à mesurer. Les statistiques horaires antérieures à ce créneau ont été reprises dans la série CT. L'historique antérieur à la mise en service est horaire : les totaux journaliers (Enphase pour le solaire, MyLight pour le reste) sont répartis heure par heure selon le profil horaire de l'API MyLight ; les heures absentes chez MyLight reportent leur énergie sur l'heure suivante.
+- **MyLight**. Laisser les logs de l’intégration hors du niveau `debug`, qui journalise le mot de passe. Éviter son export CSV dans `/config/www/`, accessible sans authentification. Lire le changelog avant chaque mise à jour du Marketplace, puis redémarrer.
+- **Rentabilité**. Ajouter les changements de tarifs et de forfaits à `mylight.jinja` avec leur date d’effet. Ajouter les relevés de l’annexe à `annex_billing`. Actualiser `reference_year` et `reference_kwh` chaque automne, puis recharger les templates.
+- **Shelly**. Régler `initial_state: on` sur les relais et détacher le bouton des six Plug M. Sur le 1PM de la pompe, détacher l’entrée et garder le seuil de courant de 16 A.
+- **Énergie**. Utiliser MyLight pour les achats, la réinjection et la batterie virtuelle. Utiliser la pince CT de l’Envoy pour la production solaire. Les statistiques antérieures au décrochage du compteur le 20 novembre 2026 ont été reprises dans la série CT.
+
+## Ce qui reste hors du dépôt
+
+- Accès et secrets locaux dans `LOCAL.md`, `secrets.yaml` et `custom_templates/mylight.jinja`.
+- Extensions du Marketplace dans `custom_components/` et `www/community/`.
+- Intégrations et réglages de l’interface dans `.storage/`. Cela comprend Workday, le tableau Énergie, les sauvegardes, les pièces, les entités renommées et les réglages de l’Envoy et des Shelly. Configurer la prise du frigo comme scanner Bluetooth actif et la production Enphase en kWh. Les sauvegardes quotidiennes chiffrées couvrent ces réglages sur le Pi et sur Google Drive.
+- Ressource Lovelace `/local/plan-heatmap.js?v=N` déclarée dans l’interface. Incrémenter `N` après un changement de [plan-heatmap.js](config/www/plan-heatmap.js).
