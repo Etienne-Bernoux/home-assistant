@@ -5,7 +5,8 @@ const solar = {
   energy: "sensor.envoy_122333060519_energie_fournie_ct_de_production",
   power: "sensor.envoy_122333060519_puissance_ct_de_production",
 };
-const gridPower = "sensor.envoy_122333060519_consommation_nette_de_puissance_actuelle";
+const gridPower = "sensor.puissance_reseau_facturee";
+const batteryPower = "sensor.puissance_batterie_virtuelle";
 
 function query(type, args = {}) {
   const { HA_URL, HA_TOKEN } = process.env;
@@ -75,12 +76,16 @@ When("je consulte les sources du tableau Énergie", async function () {
   this.sources = (await query("energy/get_prefs")).energy_sources;
 });
 
-Then("le direct utilise la pince solaire et la puissance nette de l'Envoy", function () {
+Then("le direct utilise la pince solaire, la batterie virtuelle et le réseau facturé", function () {
   const solarSource = this.sources.find(({ type }) => type === "solar");
   const grid = this.sources.find(({ type }) => type === "grid");
+  const battery = this.sources.find(({ type }) => type === "battery");
   assert.equal(solarSource.stat_energy_from, solar.energy);
   assert.equal(solarSource.stat_rate, solar.power);
-  assert.equal(grid.power_config?.stat_rate ?? grid.stat_rate, gridPower);
+  assert.equal(grid.stat_rate, gridPower);
+  assert.equal(grid.power_config?.stat_rate, gridPower);
+  assert.equal(battery.stat_rate, batteryPower);
+  assert.equal(battery.power_config?.stat_rate, batteryPower);
 });
 
 Then("le bilan de la batterie virtuelle utilise les compteurs MyLight", function () {
@@ -88,5 +93,4 @@ Then("le bilan de la batterie virtuelle utilise les compteurs MyLight", function
   assert.equal(battery.stat_energy_from, "sensor.mylight_systems_decharge_batterie");
   assert.equal(battery.stat_energy_to, "sensor.mylight_systems_charge_batterie");
   assert.equal(battery.stat_soc, "sensor.etat_de_charge_batterie_virtuelle");
-  assert.ok(!battery.stat_rate && !battery.power_config);
 });

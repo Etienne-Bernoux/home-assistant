@@ -11,7 +11,7 @@ Fonctionnalité: Mesures du tableau Énergie de Nyons
       | 17:00 | 0     | 17992.951 |
       | 18:00 | 0     | 17992.951 |
 
-  Scénario: Le direct montre les échanges physiques avec le réseau
+  Scénario: Le direct montre la batterie virtuelle et le réseau facturé
     Quand je consulte les sources du tableau Énergie
-    Alors le direct utilise la pince solaire et la puissance nette de l'Envoy
+    Alors le direct utilise la pince solaire, la batterie virtuelle et le réseau facturé
     Et le bilan de la batterie virtuelle utilise les compteurs MyLight

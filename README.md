@@ -71,7 +71,7 @@ Dans [mylight_profitability.yaml](config/packages/mylight_profitability.yaml), a
   Depuis ce relevé, le coût et la majoration reposent sur le Shelly EM. Pour contrôler la mesure, comparer l’écart du
   sous-compteur depuis 20 676,5 kWh à celui de `sensor.annexe_energie` depuis 69,918 kWh.
 - **Shelly**. Régler `initial_state: on` sur les relais et détacher le bouton des six Plug M. Sur le 1PM de la pompe, détacher l’entrée et garder le seuil de courant de 16 A.
-- **Énergie**. Utiliser MyLight pour les achats, la réinjection et la batterie virtuelle. Utiliser la pince CT de l’Envoy pour la production solaire. Les statistiques antérieures au décrochage du compteur le 20 novembre 2026 ont été reprises dans la série CT.
+- **Tableau Énergie**. Utiliser MyLight pour les achats, la réinjection et la batterie virtuelle. En direct, le réseau affiche la puissance facturée et la batterie virtuelle affiche la puissance de charge ou de décharge MyLight. La puissance nette de l’Envoy indique l’échange physique avec le réseau, avec une valeur négative en export. Utiliser la pince CT de l’Envoy pour la production solaire. Les statistiques antérieures au décrochage du compteur le 20 novembre 2026 ont été reprises dans la série CT.
 
 ## Ce qui reste hors du dépôt
 
