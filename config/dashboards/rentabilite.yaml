@@ -188,7 +188,7 @@ views:
                   title:
                     text: kWh/m²
             series:
-              - entity: sensor.envoy_122333060519_production_d_energie_totale
+              - entity: sensor.envoy_122333060519_energie_fournie_ct_de_production
                 name: Production
                 color: "#ff9800"
                 yaxis_id: production
@@ -232,7 +232,7 @@ views:
                   title:
                     text: kWh/m²
             series:
-              - entity: sensor.envoy_122333060519_production_d_energie_totale
+              - entity: sensor.envoy_122333060519_energie_fournie_ct_de_production
                 name: Production
                 color: "#ff9800"
                 yaxis_id: production
@@ -241,7 +241,7 @@ views:
                   type: change
                   period: month
                   align: start
-              - entity: sensor.envoy_122333060519_production_d_energie_totale
+              - entity: sensor.envoy_122333060519_energie_fournie_ct_de_production
                 name: Production un an avant
                 color: "#ffcc80"
                 show:
@@ -333,3 +333,14 @@ views:
               est en panne. Micro-onduleurs : chacun est nommé par la fin de son numéro de série ;
               un écart franc avec les autres en fin de journée signale une panne, et une alerte part
               au coucher du soleil quand l'un a produit moins de la moitié de la médiane.
+  - title: Bilan énergie
+    path: bilan-energie
+    icon: mdi:table-clock
+    type: panel
+    cards:
+      - type: custom:energy-capture-report
+        reconstructed:
+          - source: solar
+            from: "2025-03-29T23:00:00Z"
+            until: "2026-11-20T16:00:00Z"
+            label: Historique repris du compteur Envoy

@@ -47,6 +47,16 @@ HA_URL=http://192.168.1.250 HA_TOKEN="$(security find-generic-password -s ha-nyo
 
 Décrire dans [tests/features/](tests/features/) des résultats observables et réutiliser les templates du dépôt dans les étapes. Après un changement d’alias, d’identifiant ou de package, régénérer le [catalogue](docs/automations.md) avec `node tests/generate-automation-catalog.mjs`.
 
+## Suivre les captures
+
+Dans les ressources Lovelace, ajouter `/local/energy-capture-report.js?v=1` comme module JavaScript. L’onglet **Rentabilité > Bilan énergie** présente les sept journées terminées en heure de Paris. La consommation totale additionne les achats, la décharge virtuelle et le solaire consommé directement sur les heures où les trois sont disponibles. Chaque total porte le nombre d’heures avec une variation numérique. Une couverture incomplète donne un total partiel. Un compteur figé peut fournir 24 variations nulles.
+
+La rubrique Décrochages utilise l’historique disponible de l’écart entre les index et le seuil de l’automatisation Enphase. La durée est limitée à la fenêtre observée. L’écart maximal mesure la distance entre les index en kWh.
+
+Après un rattrapage vérifié, ajouter sa plage dans `reconstructed` de la carte, pour chaque source effectivement reprise (`solar`, `grid`, `charge`, `discharge`, `annex`, `heater`). Renseigner `from` inclus, `until` exclu avec fuseau et `label` avec l’origine des données. Le Recorder conserve les valeurs corrigées sans leur provenance.
+
+Dans **Annexe > Contrôle du sous-compteur**, saisir l’index physique au moment du relevé et lancer le script. Il conserve le dernier couple d’index et calcule l’écart Shelly moins sous-compteur sur la consommation depuis le 22 novembre 2026 à 19 h 20. Un écart positif signifie que le Shelly a mesuré davantage.
+
 ## Rattraper une panne
 
 Attendre au moins trois heures après la dernière heure à corriger. Lancer [rebuild-energy-gap.mjs](scripts/rebuild-energy-gap.mjs) à blanc, puis retirer `--dry-run` pour appliquer la correction. Relancer à blanc pour vérifier que le script ne propose plus de reprise.

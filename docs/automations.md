@@ -10,6 +10,7 @@ Ce catalogue est généré à partir des packages Home Assistant. Pour le régé
 - Alerter si l'annexe est coupée hors coupure automatique (`annex_power_lost`)
 - Remettre à zéro les coupures de l'annexe après 30 minutes sans coupure (`annex_overload_cut_reset`)
 - Alerter si l'annexe tire près de la limite de sa ligne (`annex_line_overload`)
+- Enregistrer le sous-compteur de l'annexe (`record_annex_meter`)
 
 ## Appareils
 

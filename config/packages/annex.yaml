@@ -171,3 +171,50 @@ template:
           last_kwh: >
             {% set energy = states('sensor.annexe_energie') %}
             {{ energy | float if energy | is_number else this.attributes.get('last_kwh') }}
+
+  - triggers:
+      - trigger: event
+        event_type: annex_meter_reading
+    sensor:
+      - name: Relevé comparatif annexe
+        unique_id: annex_meter_reading
+        device_class: timestamp
+        state: "{{ trigger.event.time_fired.isoformat() }}"
+        attributes:
+          meter_kwh: "{{ trigger.event.data.meter_kwh }}"
+          shelly_kwh: "{{ trigger.event.data.shelly_kwh }}"
+          difference_kwh: "{{ trigger.event.data.difference_kwh }}"
+          difference_percent: "{{ trigger.event.data.difference_percent }}"
+
+script:
+  record_annex_meter:
+    alias: Enregistrer le sous-compteur de l'annexe
+    mode: single
+    fields:
+      index_kwh:
+        name: Index du sous-compteur au moment de la saisie
+        required: true
+        selector:
+          number:
+            min: 20676.6
+            max: 9999999
+            step: 0.1
+            mode: box
+            unit_of_measurement: kWh
+    sequence:
+      - variables:
+          meter: "{{ index_kwh | default(none) | float(none) }}"
+          shelly: "{{ states('sensor.annexe_energie') | float(none) }}"
+      - if: "{{ meter is none or meter <= 20676.5 or shelly is none or shelly < 69.918 }}"
+        then:
+          - stop: Index invalide ou compteur Shelly indisponible.
+            error: true
+      - variables:
+          physical_delta: "{{ meter - 20676.5 }}"
+          difference: "{{ (shelly - 69.918) - physical_delta }}"
+      - event: annex_meter_reading
+        event_data:
+          meter_kwh: "{{ meter }}"
+          shelly_kwh: "{{ shelly }}"
+          difference_kwh: "{{ difference | round(3) }}"
+          difference_percent: "{{ (100 * difference / physical_delta) | round(2) }}"

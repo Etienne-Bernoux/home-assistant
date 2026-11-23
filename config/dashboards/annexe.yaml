@@ -130,3 +130,26 @@ views:
               toute l'annexe, puis la rallume seul après 1, 1, 3, 5 et 10 minutes ; à la sixième
               coupure, il faut la rallumer depuis le plan de l'étage. Le compteur repart à zéro après
               30 minutes sans coupure. Sans effet tant que le contacteur est en marche forcée.
+      - type: grid
+        cards:
+          - type: heading
+            heading: Contrôle du sous-compteur
+          - type: button
+            entity: script.record_annex_meter
+            name: Saisir le relevé physique actuel
+            tap_action:
+              action: more-info
+          - type: markdown
+            content: |
+              Référence du 22/11/2026 à 19 h 20 · Sous-compteur 20 676,5 kWh · Shelly 69,918 kWh.
+
+              {% set id = 'sensor.releve_comparatif_annexe' %}
+              {% if has_value(id) %}
+              **Dernier relevé le {{ as_local(as_datetime(states(id))).strftime('%d/%m/%Y à %H:%M') }}**
+
+              Sous-compteur {{ state_attr(id, 'meter_kwh') }} kWh · Shelly {{ state_attr(id, 'shelly_kwh') }} kWh.
+
+              Écart du Shelly sur la consommation depuis la référence : **{{ state_attr(id, 'difference_kwh') }} kWh ({{ state_attr(id, 'difference_percent') }} %)**.
+              {% else %}
+              En attente du premier relevé comparatif.
+              {% endif %}
