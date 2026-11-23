@@ -37,9 +37,9 @@ npm test --prefix tests -- --tags "not @jinja and not @nyons"
 
 Avec Docker, Node.js, npm, jq, curl et OpenSSL, lancer `bash tests/support/run-with-home-assistant.sh`. Comme [GitHub Actions](.github/workflows/tests.yml), ce script lance un Home Assistant isolé pour exécuter les scénarios hors ligne et les scénarios `@jinja` à partir du dépôt.
 
-Après une mise à jour du Core sur le Pi, lire le champ `version` de `GET /api/config` et épingler cette version dans `tests/support/run-with-home-assistant.sh`.
+Après une mise à jour du Core sur le Pi, reporter dans `tests/support/home-assistant-version` la version renvoyée par `GET /api/config`. Le conteneur de CI lit ce fichier, et un scénario `@nyons` signale la version à y inscrire si elle diffère de celle du Pi.
 
-Les scénarios `@nyons` lisent le calendrier et les données Énergie du Pi. Pour exécuter toute la suite depuis un poste qui peut le joindre, utiliser son URL et le jeton du trousseau macOS.
+Les scénarios `@nyons` vérifient aussi le calendrier et les données Énergie du Pi. Pour exécuter toute la suite depuis un poste qui peut le joindre, utiliser son URL et le jeton du trousseau macOS.
 
 ```bash
 HA_URL=http://192.168.1.250 HA_TOKEN="$(security find-generic-password -s ha-nyons -w)" npm test --prefix tests

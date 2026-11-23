@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-version=2026.11.2
 root=$(cd "$(dirname "$0")/../.." && pwd)
+version=$(< "$root/tests/support/home-assistant-version")
 config=$(mktemp -d)
 container=
 
