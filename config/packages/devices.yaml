@@ -14,7 +14,7 @@ automation:
           entity_id: sensor.echo_bureau_temperature
       - wait_template: "{{ states('sensor.echo_bureau_temperature') | is_number }}"
         timeout: "00:02:00"
-      - action: notify.mobile_app_pixel_6
+      - action: notify.etienne
         data:
           title: Températures des Echo
           message: >
@@ -39,7 +39,7 @@ automation:
         for: "00:10:00"
         id: unreachable
     actions:
-      - action: notify.mobile_app_pixel_6
+      - action: notify.etienne
         data:
           title: Congélateur du cellier
           message: >
@@ -64,7 +64,7 @@ automation:
         for: "00:10:00"
         id: unreachable
     actions:
-      - action: notify.mobile_app_pixel_6
+      - action: notify.etienne
         data:
           title: Frigo de la cuisine
           message: >
@@ -106,7 +106,7 @@ automation:
           - action: switch.turn_on
             target:
               entity_id: switch.prise_pompe
-      - action: notify.mobile_app_pixel_6
+      - action: notify.etienne
         data:
           title: Pompe
           message: >

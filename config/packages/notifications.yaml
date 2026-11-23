@@ -1,0 +1,5 @@
+notify:
+  - platform: group
+    name: etienne
+    services:
+      - action: mobile_app_pixel_6

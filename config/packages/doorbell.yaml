@@ -13,7 +13,7 @@ automation:
              and trigger.to_state.state | as_datetime is not none
              and now() - (trigger.to_state.state | as_datetime) < timedelta(seconds=30) }}
     actions:
-      - action: notify.mobile_app_pixel_6
+      - action: notify.etienne
         data:
           title: Sonnette
           message: Quelqu'un sonne à la porte d'entrée.
@@ -37,7 +37,7 @@ automation:
              and ding > (this.attributes.last_triggered or never)
              and pushed < ding - timedelta(seconds=60) }}
     actions:
-      - action: notify.mobile_app_pixel_6
+      - action: notify.etienne
         data:
           title: Sonnette
           message: >

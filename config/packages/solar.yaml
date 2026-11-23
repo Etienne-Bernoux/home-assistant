@@ -82,7 +82,7 @@ automation:
       - condition: template
         value_template: "{{ median > 50 and weak | count > 0 }}"
     actions:
-      - action: notify.mobile_app_pixel_6
+      - action: notify.etienne
         data:
           title: Panneaux solaires
           message: >
@@ -107,7 +107,7 @@ automation:
           entity_id: sensor.envoy_122333060519_production_d_energie_totale
       - wait_template: "{{ states('sensor.ecart_de_production_de_l_envoy') | float(2) <= 1 }}"
         timeout: "00:05:00"
-      - action: notify.mobile_app_pixel_6
+      - action: notify.etienne
         data:
           title: Panneaux solaires
           message: >

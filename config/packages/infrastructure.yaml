@@ -30,7 +30,7 @@ automation:
     actions:
       - variables:
           source: "{{ 'Envoy' if trigger.id.startswith('envoy') else 'MyLight' }}"
-      - action: notify.mobile_app_pixel_6
+      - action: notify.etienne
         data:
           title: "{{ source }} {{ 'ne répond plus' if trigger.id.endswith('_down') else 'répond de nouveau' }}"
           message: >
@@ -60,7 +60,7 @@ automation:
             {{ last is none or now() - last > timedelta(hours=26) }}
           {% endif %}
     actions:
-      - action: notify.mobile_app_pixel_6
+      - action: notify.etienne
         data:
           title: Sauvegarde Home Assistant
           message: >
@@ -77,7 +77,7 @@ automation:
       - trigger: homeassistant
         event: start
     actions:
-      - action: notify.mobile_app_pixel_6
+      - action: notify.etienne
         data:
           title: Home Assistant a redémarré
           message: "Démarrage à {{ now().strftime('%H:%M') }}."

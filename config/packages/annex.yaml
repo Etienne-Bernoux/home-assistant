@@ -50,7 +50,7 @@ automation:
           - condition: template
             value_template: "{{ attempt <= waits | count }}"
         then:
-          - action: notify.mobile_app_pixel_6
+          - action: notify.etienne
             data:
               title: Annexe coupée
               message: >
@@ -63,7 +63,7 @@ automation:
             target:
               entity_id: switch.annexe_alimentation
         else:
-          - action: notify.mobile_app_pixel_6
+          - action: notify.etienne
             data:
               title: Annexe coupée, remise manuelle
               message: >
@@ -93,7 +93,7 @@ automation:
             {{ is_state('switch.annexe_alimentation', 'on') }}
           {% endif %}
     actions:
-      - action: notify.mobile_app_pixel_6
+      - action: notify.etienne
         data:
           title: Annexe coupée
           message: >
@@ -126,7 +126,7 @@ automation:
         above: input_number.annexe_seuil_courant
         for: "00:15:00"
     actions:
-      - action: notify.mobile_app_pixel_6
+      - action: notify.etienne
         data:
           title: Annexe proche de la limite
           message: >

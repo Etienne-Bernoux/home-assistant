@@ -98,7 +98,7 @@ automation:
         not_from: unavailable
         to: "on"
     actions:
-      - action: notify.mobile_app_pixel_6
+      - action: notify.etienne
         data:
           title: Chauffe-eau
           message: >
@@ -123,7 +123,7 @@ automation:
           {% set t = last | as_datetime(none) %}
           {{ t is not none and now() - t > timedelta(days=7) }}
     actions:
-      - action: notify.mobile_app_pixel_6
+      - action: notify.etienne
         data:
           title: Chauffe-eau
           message: >
