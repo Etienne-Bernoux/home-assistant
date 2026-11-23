@@ -7,10 +7,10 @@ config=$(mktemp -d)
 container=
 
 cleanup() {
-  if [ -n "$container" ]; then
-    docker stop "$container" >/dev/null || true
-  fi
   rm -rf "$config"
+  if [ -n "$container" ]; then
+    docker rm --force --volumes "$container" >/dev/null
+  fi
 }
 trap cleanup EXIT
 
@@ -21,9 +21,10 @@ done
 cp "$config/custom_templates/mylight.example.jinja" "$config/custom_templates/mylight.jinja"
 printf 'homeassistant:\n  time_zone: Europe/Paris\napi:\nonboarding:\n' > "$config/configuration.yaml"
 
-container=$(docker run --rm -d --publish 127.0.0.1::8123 \
-  --mount "type=bind,source=$config,target=/config" \
+container=$(docker create --publish 127.0.0.1::8123 --volume /config \
   "ghcr.io/home-assistant/home-assistant:$version")
+docker cp "$config/." "$container:/config"
+docker start "$container" >/dev/null
 HA_URL="http://$(docker port "$container" 8123/tcp)"
 
 ready=false
