@@ -16,4 +16,4 @@ jobs:
           cache: npm
           cache-dependency-path: tests/package-lock.json
       - run: npm ci --prefix tests
-      - run: npm test --prefix tests -- --tags "not @nyons"
+      - run: bash tests/support/run-with-home-assistant.sh

@@ -1,7 +1,7 @@
 # language: fr
-@nyons
 Fonctionnalité: Régulation du chauffage du bureau
 
+  @jinja
   Plan du scénario: Le radiateur suit le calendrier, les seuils et la fraîcheur de la mesure
     Quand le bureau est évalué à "<heure>" avec calendrier "<ouvré>", radiateur "<relais>" et mesure "<température>" âgée de <âge> secondes
     Alors la commande du radiateur est "<commande>"
@@ -32,6 +32,7 @@ Fonctionnalité: Régulation du chauffage du bureau
       | 10:00 | on          | on          | 15          | -1  | switch.turn_off |
       | 10:00 | on          | unavailable | 15          | 10  | aucune          |
 
+  @nyons
   Plan du scénario: Le calendrier français exclut les jours fériés et le week-end
     Quand Workday évalue le "<date>"
     Alors le calendrier indique "<type de jour>"

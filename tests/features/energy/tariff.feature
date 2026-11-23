@@ -1,5 +1,5 @@
 # language: fr
-@nyons
+@jinja
 Fonctionnalité: Horaires heures creuses
 
   Plan du scénario: Les heures creuses commencent à l’ouverture et finissent à la fermeture

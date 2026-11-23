@@ -1,5 +1,5 @@
 # language: fr
-@nyons
+@jinja
 Fonctionnalité: Protection électrique de l’annexe
 
   Plan du scénario: Délai de remise sous tension après surcharge

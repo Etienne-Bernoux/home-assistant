@@ -1,5 +1,5 @@
 # language: fr
-@nyons
+@jinja
 Fonctionnalité: Coûts d’énergie utilisés pour la rentabilité MyLight
 
   Plan du scénario: Évaluer les trois coûts cumulés à partir des index en Wh

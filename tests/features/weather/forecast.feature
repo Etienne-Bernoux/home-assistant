@@ -1,5 +1,5 @@
 # language: fr
-@nyons
+@jinja
 Fonctionnalité: Consignes météo et rappels de pluie
 
   Plan du scénario: Calcul des consignes à partir de prévisions simulées
