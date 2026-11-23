@@ -10,10 +10,10 @@ Fonctionnalité: Régulation du chauffage du bureau
       | heure | ouvré       | relais      | température | âge | commande        |
       | 07:59 | on          | off         | 15          | 10  | aucune          |
       | 08:00 | on          | off         | 15          | 10  | switch.turn_on  |
-      | 09:00 | on          | off         | 18.9        | 10  | switch.turn_on  |
-      | 09:00 | on          | off         | 19          | 10  | aucune          |
-      | 12:00 | on          | on          | 19.4        | 10  | aucune          |
-      | 12:00 | on          | on          | 19.5        | 10  | switch.turn_off |
+      | 09:00 | on          | off         | 17.4        | 10  | switch.turn_on  |
+      | 09:00 | on          | off         | 17.5        | 10  | aucune          |
+      | 12:00 | on          | on          | 17.9        | 10  | aucune          |
+      | 12:00 | on          | on          | 18          | 10  | switch.turn_off |
       | 17:59 | on          | off         | 15          | 10  | switch.turn_on  |
       | 18:00 | on          | on          | 15          | 10  | switch.turn_off |
       | 10:00 | off         | off         | 15          | 10  | aucune          |

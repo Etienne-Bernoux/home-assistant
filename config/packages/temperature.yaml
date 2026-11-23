@@ -25,8 +25,8 @@ automation:
       valid_reading: >-
         {{ temperature is not none and -40 < temperature < 60
            and 0 <= reading_age < 600 }}
-      heat_below: "{{ 19 if comfort else 12.5 }}"
-      stop_at: "{{ 19.5 if comfort else 13 }}"
+      heat_below: "{{ 17.5 if comfort else 12.5 }}"
+      stop_at: "{{ 18 if comfort else 13 }}"
     actions:
       - choose:
           - conditions: >-
